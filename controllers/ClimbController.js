@@ -30,7 +30,7 @@ class ClimbController {
       .getElementById("failure-btn")
       .addEventListener("click", () => this.handleResultSelection(false));
 
-    const logAttemptBtn = document.querySelector('[onclick="logAttempt()"]');
+    const logAttemptBtn = document.getElementById('log-attempt-btn');
     if (logAttemptBtn) {
       logAttemptBtn.onclick = () => this.logAttempt();
     }

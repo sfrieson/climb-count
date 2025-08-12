@@ -36,30 +36,38 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   // Register Service Worker for PWA functionality
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js')
-        .then(function(registration) {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js").then(
+        function (registration) {
+          console.log(
+            "ServiceWorker registration successful with scope: ",
+            registration.scope
+          );
+
           // Listen for updates
-          registration.addEventListener('updatefound', () => {
+          registration.addEventListener("updatefound", () => {
             const newWorker = registration.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            newWorker.addEventListener("statechange", () => {
+              if (
+                newWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
                 // New content available, show update notification
                 showUpdateNotification();
               }
             });
           });
-        }, function(err) {
-          console.log('ServiceWorker registration failed: ', err);
-        });
+        },
+        function (err) {
+          console.log("ServiceWorker registration failed: ", err);
+        }
+      );
     });
   }
-  
+
   // Handle service worker updates
-  navigator.serviceWorker?.addEventListener('controllerchange', () => {
+  navigator.serviceWorker?.addEventListener("controllerchange", () => {
     // Reload when new service worker takes control
     window.location.reload();
   });
@@ -67,8 +75,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Show update notification to user
 function showUpdateNotification() {
-  if (confirm('A new version of Climb Count is available. Would you like to update now?')) {
+  if (
+    confirm(
+      "A new version of Climb Count is available. Would you like to update now?"
+    )
+  ) {
     // Tell the service worker to skip waiting and take control
-    navigator.serviceWorker.controller?.postMessage({ action: 'skipWaiting' });
+    navigator.serviceWorker.controller?.postMessage({ action: "skipWaiting" });
   }
-});
+}
