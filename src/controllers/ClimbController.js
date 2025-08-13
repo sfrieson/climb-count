@@ -1,4 +1,4 @@
-class ClimbController {
+export class ClimbController {
   constructor(model, view) {
     this.model = model;
     this.view = view;
@@ -51,7 +51,7 @@ class ClimbController {
     }
 
     const finishSessionBtn = document.querySelector(
-      '[onclick="finishSession()"]',
+      "[onclick=\"finishSession()\"]",
     );
     if (finishSessionBtn) {
       finishSessionBtn.onclick = () => this.finishSession();

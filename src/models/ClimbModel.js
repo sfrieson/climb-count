@@ -1,4 +1,4 @@
-class ClimbModel {
+export class ClimbModel {
   #storageKey = "climbingSessions";
   #draftKey = "climbingSessionDraft";
 
@@ -12,11 +12,11 @@ class ClimbModel {
     const saved = localStorage.getItem(this.#storageKey);
     return saved
       ? JSON.parse(saved, (key, value) => {
-          if (key === "date" || key === "timestamp") {
-            return new Date(value);
-          }
-          return value;
-        })
+        if (key === "date" || key === "timestamp") {
+          return new Date(value);
+        }
+        return value;
+      })
       : [];
   }
 

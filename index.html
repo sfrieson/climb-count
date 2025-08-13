@@ -1,24 +1,37 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Climb Count - Track Your Climbing Progress</title>
-    
+
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#2196f3" />
-    <meta name="description" content="Track your climbing progress and improve your skills" />
+    <meta
+      name="description"
+      content="Track your climbing progress and improve your skills"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Climb Count" />
     <meta name="msapplication-TileImage" content="images/icon-192.png" />
     <meta name="msapplication-TileColor" content="#2196f3" />
-    
+
     <!-- PWA Icons -->
-    <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="images/icon-512.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="images/icon-192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="images/icon-512.png"
+    />
     <link rel="apple-touch-icon" href="images/icon-192.png" />
-    
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json" />
     <style>
@@ -282,6 +295,212 @@
         gap: 20px;
         font-size: 14px;
       }
+
+      .image-preview {
+        margin-top: 10px;
+      }
+
+      .routes-list {
+        margin-top: 30px;
+      }
+
+      .route-card {
+        background: #f8f9fa;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        display: flex;
+        gap: 15px;
+      }
+
+      .route-image {
+        flex-shrink: 0;
+      }
+
+      .route-image img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+
+      .route-info {
+        flex: 1;
+      }
+
+      .route-color-indicator {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 10px;
+      }
+
+      .route-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .route-actions button {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .delete-route-btn {
+        background: #f44336;
+        color: white;
+      }
+
+      .route-selector-container {
+        margin-top: 10px;
+      }
+
+      .route-selector {
+        display: flex;
+        overflow-x: auto;
+        gap: 12px;
+        padding: 10px 0;
+        scroll-behavior: smooth;
+      }
+
+      .route-selector::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      .route-selector::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+      }
+
+      .route-selector::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 3px;
+      }
+
+      .route-selector::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+
+      .route-selector-item {
+        flex-shrink: 0;
+        cursor: pointer;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+      }
+
+      .route-selector-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .route-selector-item.selected {
+        border-color: #2196f3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+      }
+
+      .route-mini-card {
+        background: white;
+        border-radius: 6px;
+        padding: 8px;
+        width: 96px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .route-mini-image {
+        width: 80px;
+        height: 124px;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 8px;
+      }
+
+      .route-mini-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .add-icon {
+        font-size: 24px;
+        color: #2196f3;
+        font-weight: bold;
+      }
+
+      .route-mini-info {
+        text-align: center;
+      }
+
+      .route-mini-name {
+        font-size: 12px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .route-mini-details {
+        font-size: 10px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+      }
+
+      .route-mini-color {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .add-route-option .route-mini-card {
+        background: #f8f9fa;
+        border: 2px dashed #ddd;
+      }
+
+      .add-route-option:hover .route-mini-card {
+        border-color: #2196f3;
+        background: #e3f2fd;
+      }
+
+      .session-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .session-actions .btn {
+        flex: 1;
+        min-width: 120px;
+      }
+
+      @media (max-width: 768px) {
+        .session-actions {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .session-actions .btn {
+          flex: none;
+          width: 100%;
+          padding: 18px 30px;
+          font-size: 18px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -295,6 +514,7 @@
         <button class="tab active" onclick="switchTab('log')">
           Log Session
         </button>
+        <button class="tab" onclick="switchTab('routes')">Add Route</button>
         <button class="tab" onclick="switchTab('sessions')">Sessions</button>
         <button class="tab" onclick="switchTab('stats')">Statistics</button>
       </div>
@@ -327,24 +547,25 @@
           </div>
 
           <div class="form-group">
-            <label for="route-id">Route ID (Optional)</label>
-            <input
-              type="text"
-              id="route-id"
-              placeholder="e.g., Wall A - Route 3, or any identifier"
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Route Color</label>
-            <div class="route-colors" id="route-colors">
-              <div class="color-btn green" data-color="green">Green</div>
-              <div class="color-btn yellow" data-color="yellow">Yellow</div>
-              <div class="color-btn orange" data-color="orange">Orange</div>
-              <div class="color-btn red" data-color="red">Red</div>
-              <div class="color-btn purple" data-color="purple">Purple</div>
-              <div class="color-btn black" data-color="black">Black</div>
-              <div class="color-btn white" data-color="white">White</div>
+            <label>Select Route</label>
+            <div class="route-selector-container">
+              <div class="route-selector" id="route-selector">
+                <div
+                  class="route-selector-item add-route-option"
+                  data-route-id="add-new"
+                >
+                  <div class="route-mini-card">
+                    <div class="route-mini-image">
+                      <span class="add-icon">+</span>
+                    </div>
+                    <div class="route-mini-info">
+                      <div class="route-mini-name">Add New Route</div>
+                      <div class="route-mini-details">Go to Routes tab</div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Route items will be populated here -->
+              </div>
             </div>
           </div>
 
@@ -365,21 +586,85 @@
             />
           </div>
 
-          <button class="btn" id="log-attempt-btn">Log Attempt</button>
-          <button
-            class="btn"
-            onclick="finishSession()"
-            style="margin-left: 10px; background: #4caf50"
-          >
-            Finish Session
-          </button>
-          <button
-            class="btn"
-            onclick="clearSession()"
-            style="margin-left: 10px; background: #f44336"
-          >
-            Clear Session
-          </button>
+          <div class="session-actions">
+            <button class="btn" id="log-attempt-btn">Log Attempt</button>
+            <button
+              class="btn"
+              onclick="finishSession()"
+              style="background: #4caf50"
+            >
+              Finish Session
+            </button>
+            <button
+              class="btn"
+              onclick="clearSession()"
+              style="background: #f44336"
+            >
+              Clear Session
+            </button>
+          </div>
+        </div>
+
+        <div id="routes" class="tab-pane">
+          <h2>Add New Route</h2>
+
+          <div class="form-group">
+            <label for="route-image">Route Image</label>
+            <input type="file" id="route-image" accept="image/*" />
+            <div id="image-preview" class="image-preview" style="display: none">
+              <img
+                id="preview-img"
+                style="max-width: 300px; max-height: 200px; border-radius: 8px"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Route Color</label>
+            <div class="route-colors" id="route-colors-add">
+              <div class="color-btn green" data-color="green">Green</div>
+              <div class="color-btn yellow" data-color="yellow">Yellow</div>
+              <div class="color-btn orange" data-color="orange">Orange</div>
+              <div class="color-btn red" data-color="red">Red</div>
+              <div class="color-btn purple" data-color="purple">Purple</div>
+              <div class="color-btn black" data-color="black">Black</div>
+              <div class="color-btn white" data-color="white">White</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="route-name">Route Name (Optional)</label>
+            <input
+              type="text"
+              id="route-name"
+              placeholder="e.g., Wall A - Route 3"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="route-gym">Gym/Location</label>
+            <input
+              type="text"
+              id="route-gym"
+              placeholder="Enter gym or climbing location"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="route-notes">Notes (Optional)</label>
+            <input
+              type="text"
+              id="route-notes"
+              placeholder="Any additional notes about this route"
+            />
+          </div>
+
+          <button class="btn" id="save-route-btn">Save Route</button>
+
+          <div class="routes-list" id="routes-list">
+            <h3>Saved Routes</h3>
+            <div id="routes-container"></div>
+          </div>
         </div>
 
         <div id="sessions" class="tab-pane">
@@ -398,9 +683,6 @@
       </div>
     </div>
 
-    <script src="models/ClimbModel.js"></script>
-    <script src="views/ClimbView.js"></script>
-    <script src="controllers/ClimbController.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="src/main.js"></script>
   </body>
 </html>

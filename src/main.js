@@ -1,28 +1,36 @@
+import { ClimbModel } from "./models/ClimbModel.js";
+import { ClimbView } from "./views/ClimbView.js";
+import { ClimbController } from "./controllers/ClimbController.js";
+import { RouteModel } from "./models/RouteModel.js";
+import { RouteView } from "./views/RouteView.js";
+import { RouteController } from "./controllers/RouteController.js";
+
 let app;
 
-function switchTab(tabName) {
+// Global functions for HTML onclick handlers
+window.switchTab = function (tabName) {
   if (app && app.controller) {
     app.controller.handleTabSwitch(tabName);
   }
-}
+};
 
-function logAttempt() {
+window.logAttempt = function () {
   if (app && app.controller) {
     app.controller.logAttempt();
   }
-}
+};
 
-function finishSession() {
+window.finishSession = function () {
   if (app && app.controller) {
     app.controller.finishSession();
   }
-}
+};
 
-function clearSession() {
+window.clearSession = function () {
   if (app && app.controller) {
     app.controller.clearSession();
   }
-}
+};
 
 document.addEventListener("DOMContentLoaded", function () {
   const model = new ClimbModel();

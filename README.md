@@ -13,6 +13,7 @@ A climbing progress tracking application built with vanilla JavaScript following
 The application is now organized using the MVC pattern for better separation of concerns:
 
 ### Model (`models/ClimbModel.js`)
+
 - **Responsibility**: Data management and business logic
 - **Features**:
   - Session and attempt data management
@@ -21,6 +22,7 @@ The application is now organized using the MVC pattern for better separation of 
   - Data validation
 
 ### View (`views/ClimbView.js`)
+
 - **Responsibility**: DOM manipulation and rendering
 - **Features**:
   - Session and statistics rendering
@@ -29,6 +31,7 @@ The application is now organized using the MVC pattern for better separation of 
   - UI state management
 
 ### Controller (`controllers/ClimbController.js`)
+
 - **Responsibility**: User interactions and application flow
 - **Features**:
   - Event handling
@@ -37,6 +40,7 @@ The application is now organized using the MVC pattern for better separation of 
   - Navigation management
 
 ### Main Application (`app.js`)
+
 - **Responsibility**: Application initialization and global function exports
 - **Features**:
   - MVC component instantiation

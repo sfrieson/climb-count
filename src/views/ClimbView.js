@@ -51,10 +51,10 @@ class ClimbView {
                 <div>
                     ${routeInfo}
                     ${
-                      attempt.notes
-                        ? `<br><small>Notes: ${attempt.notes}</small>`
-                        : ""
-                    }
+  attempt.notes
+    ? `<br><small>Notes: ${attempt.notes}</small>`
+    : ""
+}
                 </div>
                 <div>
                     ${attempt.success ? "✅ Success" : "❌ Failed"}
@@ -176,11 +176,11 @@ class ClimbView {
         const rate = ((stats.success / stats.total) * 100).toFixed(1);
         return `
                     <div class="stat-card" style="border-left: 5px solid ${this.getColorHex(
-                      color,
-                    )};">
+    color,
+  )};">
                         <div style="font-weight: bold; color: ${this.getColorHex(
-                          color,
-                        )};">${color.toUpperCase()}</div>
+    color,
+  )};">${color.toUpperCase()}</div>
                         <div class="stat-number">${rate}%</div>
                         <div>${stats.success}/${stats.total} attempts</div>
                     </div>
@@ -443,8 +443,8 @@ class ClimbView {
         const rate = ((stats.success / stats.total) * 100).toFixed(0);
         return `<span style="color: ${this.getColorHex(color)};">
                     <strong>${color.toUpperCase()}</strong>: ${stats.success}/${
-                      stats.total
-                    } (${rate}%)
+  stats.total
+} (${rate}%)
                 </span>`;
       })
       .join(" | ");
@@ -466,8 +466,8 @@ class ClimbView {
         }" 
                           style="display: inline-block; margin: 2px; padding: 4px 6px; 
                                  background: ${color}; color: ${
-                                   attemptColor === "white" ? "black" : "white"
-                                 }; 
+  attemptColor === "white" ? "black" : "white"
+}; 
                                  border-radius: 4px; font-size: 12px;">
                         ${symbol}
                     </span>`;
@@ -552,3 +552,5 @@ class ClimbView {
     document.getElementById(tabName).classList.add("active");
   }
 }
+
+export { ClimbView };
