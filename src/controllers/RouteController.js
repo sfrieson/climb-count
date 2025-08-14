@@ -6,6 +6,7 @@ export class RouteController {
     this.model = model;
     this.view = view;
     this.selectedColor = null;
+    this.climbController = null; // Will be set by main.js
 
     this.initializeController();
   }
@@ -126,8 +127,8 @@ export class RouteController {
       this.view.renderRoutes(routesWithUrls);
 
       // Notify the main controller to refresh route selector
-      if (app && app.controller) {
-        await app.controller.loadRouteSelector();
+      if (this.climbController) {
+        await this.climbController.loadRouteSelector();
       }
     } catch (error) {
       console.error("Error loading routes:", error);
@@ -150,8 +151,8 @@ export class RouteController {
       this.view.showSuccess("Route deleted successfully!");
 
       // Notify the main controller to refresh route selector
-      if (app && app.controller) {
-        await app.controller.loadRouteSelector();
+      if (this.climbController) {
+        await this.climbController.loadRouteSelector();
       }
     } catch (error) {
       console.error("Error deleting route:", error);
@@ -164,7 +165,13 @@ export class RouteController {
    */
   async getRoute(routeId) {
     try {
-      return await this.model.getRouteById(routeId);
+      // Convert string ID to number (IndexedDB auto-increment keys are numbers)
+      const numericId = parseInt(routeId, 10);
+      if (isNaN(numericId)) {
+        console.error("Invalid route ID:", routeId);
+        return null;
+      }
+      return await this.model.getRouteById(numericId);
     } catch (error) {
       console.error("Error getting route:", error);
       return null;

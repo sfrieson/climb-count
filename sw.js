@@ -1,6 +1,7 @@
 // Cache version - increment this when you want to force cache updates
-const CACHE_VERSION = "1.0.0";
+const CACHE_VERSION = "2.0.0";
 const CACHE_NAME = `climb-count-v${CACHE_VERSION}`;
+const STORAGE_PERSISTENCE_KEY = "climb-count-storage-persistent";
 
 // Files to cache with cache-busting strategy
 const urlsToCache = [
@@ -30,23 +31,30 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches with storage preservation
 self.addEventListener("activate", (event) => {
   console.log("Service Worker: Activate Event");
   event.waitUntil(
-    caches
-      .keys()
-      .then((cacheNames) => {
+    Promise.all([
+      // Clean up old caches
+      caches.keys().then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
-            if (cacheName !== CACHE_NAME) {
-              console.log("Service Worker: Deleting Old Cache");
+            if (
+              cacheName !== CACHE_NAME &&
+              cacheName.startsWith("climb-count-")
+            ) {
+              console.log("Service Worker: Deleting Old Cache:", cacheName);
               return caches.delete(cacheName);
             }
           }),
         );
-      })
-      .then(() => self.clients.claim()),
+      }),
+      // Ensure storage persistence
+      ensureStoragePersistence(),
+      // Take control of all pages
+      self.clients.claim(),
+    ]),
   );
 });
 
@@ -132,10 +140,153 @@ function doBackgroundSync() {
   });
 }
 
+// Ensure storage persistence
+async function ensureStoragePersistence() {
+  try {
+    if ("storage" in navigator && "persist" in navigator.storage) {
+      const persistent = await navigator.storage.persist();
+      console.log("Service Worker: Storage persistence granted:", persistent);
+
+      // Store persistence status
+      await caches.open(CACHE_NAME).then((cache) => {
+        return cache.put(
+          new Request(STORAGE_PERSISTENCE_KEY),
+          new Response(JSON.stringify({ persistent, timestamp: Date.now() })),
+        );
+      });
+
+      return persistent;
+    }
+  } catch (error) {
+    console.error(
+      "Service Worker: Failed to request storage persistence:",
+      error,
+    );
+  }
+  return false;
+}
+
+// Handle data backup requests
+async function handleDataBackup(event) {
+  try {
+    // Open IndexedDB and export data
+    const db = await new Promise((resolve, reject) => {
+      const request = indexedDB.open("climbCountDB", 2);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+
+    const backupData = {
+      version: 2,
+      timestamp: new Date().toISOString(),
+      sessions: await getAllFromStore(db, "sessions"),
+      routes: await getAllFromStore(db, "routes"),
+      drafts: await getAllFromStore(db, "drafts"),
+    };
+
+    // Send backup data back to client
+    event.ports[0].postMessage({
+      success: true,
+      data: JSON.stringify(backupData, null, 2),
+    });
+  } catch (error) {
+    console.error("Service Worker: Backup failed:", error);
+    event.ports[0].postMessage({
+      success: false,
+      error: error.message,
+    });
+  }
+}
+
+// Handle data restore requests
+async function handleDataRestore(event) {
+  try {
+    const backupData = JSON.parse(event.data.backup);
+
+    const db = await new Promise((resolve, reject) => {
+      const request = indexedDB.open("climbCountDB", 2);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+
+    // Restore each store
+    if (backupData.sessions) {
+      await restoreToStore(db, "sessions", backupData.sessions);
+    }
+    if (backupData.routes) {
+      await restoreToStore(db, "routes", backupData.routes);
+    }
+    if (backupData.drafts) {
+      await restoreToStore(db, "drafts", backupData.drafts);
+    }
+
+    event.ports[0].postMessage({ success: true });
+  } catch (error) {
+    console.error("Service Worker: Restore failed:", error);
+    event.ports[0].postMessage({
+      success: false,
+      error: error.message,
+    });
+  }
+}
+
+// Helper function to get all records from a store
+async function getAllFromStore(db, storeName) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([storeName], "readonly");
+    const store = transaction.objectStore(storeName);
+    const request = store.getAll();
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Helper function to restore data to a store
+async function restoreToStore(db, storeName, data) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([storeName], "readwrite");
+    const store = transaction.objectStore(storeName);
+
+    // Clear existing data
+    const clearRequest = store.clear();
+    clearRequest.onsuccess = () => {
+      let completed = 0;
+      const total = data.length;
+
+      if (total === 0) {
+        resolve();
+        return;
+      }
+
+      data.forEach((item) => {
+        const addRequest = store.add(item);
+        addRequest.onsuccess = () => {
+          completed++;
+          if (completed === total) resolve();
+        };
+        addRequest.onerror = () => reject(addRequest.error);
+      });
+    };
+
+    clearRequest.onerror = () => reject(clearRequest.error);
+  });
+}
+
 // Handle messages from the main thread
 self.addEventListener("message", (event) => {
   if (event.data && event.data.action === "skipWaiting") {
     self.skipWaiting();
+  }
+
+  // Handle storage backup requests
+  if (event.data && event.data.action === "backup-data") {
+    handleDataBackup(event);
+  }
+
+  // Handle storage restore requests
+  if (event.data && event.data.action === "restore-data") {
+    handleDataRestore(event);
   }
 });
 

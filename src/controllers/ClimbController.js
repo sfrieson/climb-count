@@ -4,24 +4,18 @@ export class ClimbController {
     this.view = view;
     this.selectedRoute = null;
     this.selectedResult = null;
+    this.routeController = null; // Will be set by main.js
 
     this.initializeApp();
   }
 
-  initializeApp() {
+  async initializeApp() {
     this.view.setCurrentDateTime();
     this.setupEventListeners();
-    this.refreshViews();
-    this.checkForDraft();
+    await this.refreshViews();
+    await this.checkForDraft();
 
-    // Load routes if we're starting on the log tab (page refresh)
-    const activeTab = document.querySelector(".tab.active");
-    if (activeTab && activeTab.textContent.trim() === "Log Session") {
-      // Use setTimeout to ensure route controller is fully initialized
-      setTimeout(() => {
-        this.loadRouteSelector();
-      }, 0);
-    }
+    // Note: Route loading will be handled after route controller is set in main.js
   }
 
   setupEventListeners() {
@@ -38,6 +32,12 @@ export class ClimbController {
       }
     });
 
+    // Gym dropdown event listener
+    const gymSelect = document.getElementById("gym-select");
+    if (gymSelect) {
+      gymSelect.addEventListener("change", () => this.handleGymChange());
+    }
+
     document
       .getElementById("success-btn")
       .addEventListener("click", () => this.handleResultSelection(true));
@@ -47,14 +47,14 @@ export class ClimbController {
 
     const logAttemptBtn = document.getElementById("log-attempt-btn");
     if (logAttemptBtn) {
-      logAttemptBtn.onclick = () => this.logAttempt();
+      logAttemptBtn.onclick = async () => await this.logAttempt();
     }
 
     const finishSessionBtn = document.querySelector(
       "[onclick=\"finishSession()\"]",
     );
     if (finishSessionBtn) {
-      finishSessionBtn.onclick = () => this.finishSession();
+      finishSessionBtn.onclick = async () => await this.finishSession();
     }
 
     const tabs = document.querySelectorAll(".tab");
@@ -67,9 +67,9 @@ export class ClimbController {
   }
 
   async handleRouteSelection(routeId) {
-    if (app && app.routeController) {
+    if (this.routeController) {
       try {
-        const route = await app.routeController.getRoute(routeId);
+        const route = await this.routeController.getRoute(routeId);
         if (route) {
           this.selectedRoute = route;
           this.view.selectRoute(routeId);
@@ -87,7 +87,7 @@ export class ClimbController {
         this.selectedRoute = null;
       }
     } else {
-      console.error("App or routeController not available");
+      console.error("RouteController not available");
       this.view.showAlert("Unable to select route. Please refresh the page.");
       this.selectedRoute = null;
     }
@@ -96,6 +96,10 @@ export class ClimbController {
   handleResultSelection(success) {
     this.selectedResult = success;
     this.view.selectResult(success);
+  }
+
+  async handleGymChange() {
+    await this.loadRouteSelector();
   }
 
   async handleTabSwitch(tabName) {
@@ -107,12 +111,12 @@ export class ClimbController {
       this.refreshSessionsView();
     } else if (tabName === "stats") {
       this.refreshStatsView();
-    } else if (tabName === "routes" && app && app.routeController) {
-      app.routeController.handleRouteTabSwitch();
+    } else if (tabName === "routes" && this.routeController) {
+      this.routeController.handleRouteTabSwitch();
     }
   }
 
-  logAttempt() {
+  async logAttempt() {
     if (!this.selectedRoute || this.selectedResult === null) {
       this.view.showAlert("Please select a route and result");
       return;
@@ -120,7 +124,7 @@ export class ClimbController {
 
     try {
       if (!this.model.getCurrentSession()) {
-        this.startNewSession();
+        await this.startNewSession();
       }
 
       const formData = this.view.getFormData();
@@ -131,8 +135,7 @@ export class ClimbController {
         notes: formData.notes,
       };
 
-      this.model.addAttemptToCurrentSession(attemptData);
-      this.model.saveDraft(); // Auto-save draft after adding attempt
+      await this.model.addAttemptToCurrentSession(attemptData);
       this.refreshCurrentSessionView();
       this.clearAttemptForm();
     } catch (error) {
@@ -140,15 +143,19 @@ export class ClimbController {
     }
   }
 
-  startNewSession() {
+  async startNewSession() {
     const formData = this.view.getFormData();
+
+    if (!this.selectedRoute) {
+      throw new Error("Please select a route before starting a session");
+    }
 
     try {
       this.model.startNewSession({
         date: formData.sessionDate,
-        gym: formData.gymName,
+        gym: this.selectedRoute.gym || "Unknown Gym",
       });
-      this.model.saveDraft(); // Auto-save draft when session starts
+      await this.model.saveDraft(); // Auto-save draft when session starts
       this.view.showCurrentSession();
     } catch (error) {
       this.view.showAlert(error.message);
@@ -156,11 +163,11 @@ export class ClimbController {
     }
   }
 
-  finishSession() {
+  async finishSession() {
     try {
-      this.model.finishCurrentSession();
+      await this.model.finishCurrentSession();
       this.view.hideCurrentSession();
-      this.refreshViews();
+      await this.refreshViews();
     } catch (error) {
       this.view.showAlert(error.message);
     }
@@ -200,14 +207,22 @@ export class ClimbController {
   }
 
   async loadRouteSelector() {
-    if (app && app.routeController) {
+    if (this.routeController) {
       try {
-        const routes = await app.routeModel.getAllRoutes();
+        const routes = await this.routeController.model.getAllRoutes();
         const routesWithUrls = routes.map((route) => ({
           ...route,
-          imageUrl: app.routeModel.createImageURL(route),
+          imageUrl: this.routeController.model.createImageURL(route),
         }));
-        this.view.renderRouteSelector(routesWithUrls);
+
+        // Populate gym dropdown
+        this.view.populateGymDropdown(routesWithUrls);
+
+        // Get selected gym from dropdown
+        const selectedGym = document.getElementById("gym-select").value;
+
+        // Render route selector with filtered routes
+        this.view.renderRouteSelector(routesWithUrls, selectedGym);
       } catch (error) {
         console.error("Error loading route selector:", error);
       }
@@ -216,8 +231,8 @@ export class ClimbController {
 
   // Draft management methods
 
-  checkForDraft() {
-    if (this.model.hasDraft()) {
+  async checkForDraft() {
+    if (await this.model.hasDraft()) {
       const currentSession = this.model.getCurrentSession();
       if (currentSession) {
         this.view.showCurrentSession();
@@ -226,7 +241,7 @@ export class ClimbController {
     }
   }
 
-  clearSession() {
+  async clearSession() {
     // Ask for confirmation before clearing
     if (
       !confirm(
@@ -237,7 +252,7 @@ export class ClimbController {
     }
 
     try {
-      this.model.deleteDraft();
+      await this.model.deleteDraft();
       this.model.currentSession = null;
       this.view.hideCurrentSession();
       this.clearAttemptForm();

@@ -52,7 +52,7 @@ This appears to be a climbing-related counting application.
 1. **Before making changes**: Run `npm run build` and `npm run test` to understand current state
 2. **After making changes**: Always run these commands in sequence:
    - `npm run lint:fix` - Fix any linting issues
-   - `npm run format` - Format all code consistently  
+   - `npm run format` - Format all code consistently
    - `npm run test` - Ensure all tests pass
    - `npm run build` - Verify production build works
    - `npm run validate` - Run full validation suite (note: may have linting/formatting conflicts)
@@ -70,7 +70,7 @@ This appears to be a climbing-related counting application.
    - Focus on core business logic testing
 
 5. **Code Style**:
-   - Follow ESLint rules (defined in eslint.config.js) 
+   - Follow ESLint rules (defined in eslint.config.js)
    - Use double quotes, 2-space indentation
    - Add JSDoc comments for functions and classes
    - Keep functions small and focused

@@ -491,13 +491,35 @@ class ClimbView {
     );
     return {
       sessionDate: document.getElementById("session-date").value,
-      gymName: document.getElementById("gym-name").value,
+      selectedGym: document.getElementById("gym-select").value,
       selectedRouteId: selectedRoute ? selectedRoute.dataset.routeId : null,
       notes: document.getElementById("notes").value,
     };
   }
 
-  renderRouteSelector(routes) {
+  populateGymDropdown(routes) {
+    const gymSelect = document.getElementById("gym-select");
+
+    // Get unique gyms from routes
+    const gyms = [
+      ...new Set(routes.map((route) => route.gym).filter((gym) => gym)),
+    ].sort();
+
+    // Clear existing options except the "All gyms" option
+    while (gymSelect.children.length > 1) {
+      gymSelect.removeChild(gymSelect.lastChild);
+    }
+
+    // Add gym options
+    gyms.forEach((gym) => {
+      const option = document.createElement("option");
+      option.value = gym;
+      option.textContent = gym;
+      gymSelect.appendChild(option);
+    });
+  }
+
+  renderRouteSelector(routes, selectedGym = "") {
     const container = document.getElementById("route-selector");
     const addNewButton = container.querySelector(".add-route-option");
 
@@ -507,7 +529,12 @@ class ClimbView {
     );
     routeItems.forEach((item) => item.remove());
 
-    routes.forEach((route) => {
+    // Filter routes based on selected gym
+    const filteredRoutes = selectedGym
+      ? routes.filter((route) => route.gym === selectedGym)
+      : routes;
+
+    filteredRoutes.forEach((route) => {
       const routeItem = document.createElement("div");
       routeItem.className = "route-selector-item";
       routeItem.dataset.routeId = route.id;
@@ -550,6 +577,15 @@ class ClimbView {
       .querySelector(`[onclick="switchTab('${tabName}')"]`)
       .classList.add("active");
     document.getElementById(tabName).classList.add("active");
+
+    // Handle settings tab specific actions
+    if (tabName === "settings") {
+      setTimeout(() => {
+        if (window.checkStorageStatus) {
+          window.checkStorageStatus();
+        }
+      }, 100);
+    }
   }
 }
 

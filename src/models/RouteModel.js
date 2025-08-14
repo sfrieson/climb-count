@@ -3,7 +3,7 @@
  */
 export class RouteModel {
   #dbName = "climbCountDB";
-  #version = 1;
+  #version = 2; // Updated to match ClimbModel
   #storeName = "routes";
   #db = null;
 
@@ -23,25 +23,35 @@ export class RouteModel {
         reject(request.error);
       };
 
-      request.onsuccess = () => {
+      request.onsuccess = async () => {
         this.#db = request.result;
+
+        // Request persistent storage
+        if ("storage" in navigator && "persist" in navigator.storage) {
+          try {
+            const persistent = await navigator.storage.persist();
+            console.log("RouteModel storage persistence granted:", persistent);
+          } catch (error) {
+            console.warn(
+              "RouteModel could not request storage persistence:",
+              error,
+            );
+          }
+        }
+
         resolve(this.#db);
       };
 
       request.onupgradeneeded = (event) => {
         const db = event.target.result;
+        const oldVersion = event.oldVersion;
 
-        if (!db.objectStoreNames.contains(this.#storeName)) {
-          const store = db.createObjectStore(this.#storeName, {
-            keyPath: "id",
-            autoIncrement: true,
-          });
+        console.log(
+          `Upgrading RouteModel database from version ${oldVersion} to ${this.#version}`,
+        );
 
-          store.createIndex("color", "color", { unique: false });
-          store.createIndex("name", "name", { unique: false });
-          store.createIndex("gym", "gym", { unique: false });
-          store.createIndex("createdAt", "createdAt", { unique: false });
-        }
+        // All stores are created by ClimbModel during upgrade
+        // This ensures consistent schema between models
       };
     });
   }
