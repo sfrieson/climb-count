@@ -209,9 +209,9 @@ class RouteView {
       dialog.className = "dialog";
       
       const colorOptions = Object.keys(this.colorMap).map(color => {
-        const selected = color === route.color ? 'selected' : '';
+        const selected = color === route.color ? "selected" : "";
         return `<div class="color-btn ${color} ${selected}" data-color="${color}">${color.charAt(0).toUpperCase() + color.slice(1)}</div>`;
-      }).join('');
+      }).join("");
       
       dialog.innerHTML = `
         <div class="dialog-header">
@@ -222,7 +222,7 @@ class RouteView {
             <label for="edit-route-image">Route Image</label>
             <input type="file" id="edit-route-image" accept="image/*" />
             <div id="edit-image-preview" class="image-preview">
-              <img id="edit-preview-img" src="${route.imageUrl || ''}" style="max-width: 300px; max-height: 200px; border-radius: 8px" />
+              <img id="edit-preview-img" src="${route.imageUrl || ""}" style="max-width: 300px; max-height: 200px; border-radius: 8px" />
             </div>
           </div>
           
@@ -235,17 +235,17 @@ class RouteView {
           
           <div class="form-group">
             <label for="edit-route-name">Route Name</label>
-            <input type="text" id="edit-route-name" value="${route.name || ''}" placeholder="e.g., Wall A - Route 3" />
+            <input type="text" id="edit-route-name" value="${route.name || ""}" placeholder="e.g., Wall A - Route 3" />
           </div>
           
           <div class="form-group">
             <label for="edit-route-gym">Gym/Location</label>
-            <input type="text" id="edit-route-gym" value="${route.gym || ''}" placeholder="Enter gym or climbing location" />
+            <input type="text" id="edit-route-gym" value="${route.gym || ""}" placeholder="Enter gym or climbing location" />
           </div>
           
           <div class="form-group">
             <label for="edit-route-notes">Notes</label>
-            <input type="text" id="edit-route-notes" value="${route.notes || ''}" placeholder="Any additional notes about this route" />
+            <input type="text" id="edit-route-notes" value="${route.notes || ""}" placeholder="Any additional notes about this route" />
           </div>
         </div>
         <div class="dialog-footer">
