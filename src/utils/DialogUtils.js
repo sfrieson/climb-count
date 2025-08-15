@@ -91,7 +91,7 @@ class DialogUtils {
 
       // Focus the confirm button
       setTimeout(() => {
-        const confirmBtn = dialog.querySelector('[data-action="confirm"]');
+        const confirmBtn = dialog.querySelector("[data-action=\"confirm\"]");
         confirmBtn.focus();
       }, 100);
     });
