@@ -606,7 +606,7 @@ class ClimbView {
 
     const routeOptions = routes
       .map((route) => {
-        const colorHex = this.getColorHex(route.color);
+        // const colorHex = this.getColorHex(route.color); // Not needed for this modal
         const selected = attempt.routeId === route.id ? "selected" : "";
         return `<option value="${route.id}" ${selected} data-color="${route.color}" data-name="${route.name || "Unnamed"}" data-gym="${route.gym || ""}">
           ${route.name || "Unnamed"} (${route.color.toUpperCase()}) ${route.gym ? `• ${route.gym}` : ""}

@@ -43,7 +43,7 @@ export class RouteModel {
       };
 
       request.onupgradeneeded = (event) => {
-        const db = event.target.result;
+        // const db = event.target.result; // Database handled by ClimbModel
         const oldVersion = event.oldVersion;
 
         console.log(
