@@ -53,10 +53,10 @@ class ClimbView {
                 <div>
                     ${routeInfo}
                     ${
-  attempt.notes
-    ? `<br><small>Notes: ${attempt.notes}</small>`
-    : ""
-}
+                      attempt.notes
+                        ? `<br><small>Notes: ${attempt.notes}</small>`
+                        : ""
+                    }
                 </div>
                 <div class="attempt-actions">
                     ${attempt.success ? "✅ Success" : "❌ Failed"}
@@ -179,11 +179,11 @@ class ClimbView {
         const rate = ((stats.success / stats.total) * 100).toFixed(1);
         return `
                     <div class="stat-card" style="border-left: 5px solid ${this.getColorHex(
-    color,
-  )};">
+                      color,
+                    )};">
                         <div style="font-weight: bold; color: ${this.getColorHex(
-    color,
-  )};">${color.toUpperCase()}</div>
+                          color,
+                        )};">${color.toUpperCase()}</div>
                         <div class="stat-number">${rate}%</div>
                         <div>${stats.success}/${stats.total} attempts</div>
                     </div>
@@ -446,8 +446,8 @@ class ClimbView {
         const rate = ((stats.success / stats.total) * 100).toFixed(0);
         return `<span style="color: ${this.getColorHex(color)};">
                     <strong>${color.toUpperCase()}</strong>: ${stats.success}/${
-  stats.total
-} (${rate}%)
+                      stats.total
+                    } (${rate}%)
                 </span>`;
       })
       .join(" | ");
@@ -466,12 +466,12 @@ class ClimbView {
           : "Unknown Route";
         return `<span class="timeline-attempt" data-session-id="${session.id}" data-attempt-id="${attempt.id}" 
                       title="${routeName} (${attemptColor}) - ${
-  attempt.success ? "Success" : "Failed"
-} - Click to edit" 
+                        attempt.success ? "Success" : "Failed"
+                      } - Click to edit" 
                       style="display: inline-block; margin: 2px; padding: 4px 6px; 
                              background: ${color}; color: ${
-  attemptColor === "white" ? "black" : "white"
-}; 
+                               attemptColor === "white" ? "black" : "white"
+                             }; 
                              border-radius: 4px; font-size: 12px; cursor: pointer;
                              position: relative;">
                         ${symbol}
@@ -605,7 +605,7 @@ class ClimbView {
     modal.id = "edit-attempt-modal";
 
     const routeOptions = routes
-      .map(route => {
+      .map((route) => {
         const colorHex = this.getColorHex(route.color);
         const selected = attempt.routeId === route.id ? "selected" : "";
         return `<option value="${route.id}" ${selected} data-color="${route.color}" data-name="${route.name || "Unnamed"}" data-gym="${route.gym || ""}">
@@ -656,7 +656,7 @@ class ClimbView {
     // Add single click event listener to the modal using event delegation
     modal.addEventListener("click", async (e) => {
       const target = e.target;
-      
+
       // Handle close button (X)
       if (target.classList.contains("modal-close")) {
         e.preventDefault();
@@ -666,18 +666,21 @@ class ClimbView {
       }
 
       // Handle result selection buttons
-      if (target.classList.contains("success-btn") || target.classList.contains("failure-btn")) {
+      if (
+        target.classList.contains("success-btn") ||
+        target.classList.contains("failure-btn")
+      ) {
         e.preventDefault();
         e.stopPropagation();
-        
+
         // Remove selected class from both buttons
-        modal.querySelectorAll(".success-btn, .failure-btn").forEach(btn => {
+        modal.querySelectorAll(".success-btn, .failure-btn").forEach((btn) => {
           btn.classList.remove("selected");
         });
-        
+
         // Add selected class to clicked button
         target.classList.add("selected");
-        
+
         // Update selected success value
         selectedSuccess = target.dataset.result === "true";
         console.log("Result selected:", selectedSuccess);
@@ -688,7 +691,7 @@ class ClimbView {
       if (target.dataset.action) {
         e.preventDefault();
         e.stopPropagation();
-        
+
         const action = target.dataset.action;
         console.log("Action clicked:", action);
 
@@ -698,9 +701,9 @@ class ClimbView {
           // Use custom dialog instead of browser confirm
           const confirmed = await dialogUtils.showConfirm(
             "Are you sure you want to delete this attempt? This action cannot be undone.",
-            "Delete Attempt"
+            "Delete Attempt",
           );
-          
+
           if (confirmed) {
             onDelete();
             this.hideEditAttemptModal();
@@ -721,10 +724,10 @@ class ClimbView {
               id: parseInt(routeSelect.value),
               color: selectedOption.dataset.color,
               name: selectedOption.dataset.name,
-              gym: selectedOption.dataset.gym
+              gym: selectedOption.dataset.gym,
             },
             success: selectedSuccess,
-            notes: notes || null
+            notes: notes || null,
           };
 
           console.log("Saving updated data:", updatedData);
@@ -760,9 +763,9 @@ class ClimbView {
       // Remove event listeners by removing the element completely
       modal.remove();
     }
-    
+
     // Also clean up any stray modals with the same class
-    document.querySelectorAll(".modal-overlay").forEach(m => {
+    document.querySelectorAll(".modal-overlay").forEach((m) => {
       if (m.id === "edit-attempt-modal") {
         m.remove();
       }

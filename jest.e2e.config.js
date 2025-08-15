@@ -11,7 +11,7 @@ export default {
   verbose: true,
   collectCoverage: false, // Coverage not meaningful for E2E tests
   transform: {},
-  
+
   // Longer timeout for E2E tests
   globalSetup: "<rootDir>/tests/e2e/global.setup.js",
   globalTeardown: "<rootDir>/tests/e2e/global.teardown.js",

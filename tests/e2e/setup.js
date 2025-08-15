@@ -16,7 +16,7 @@ export const TEST_CONFIG = {
   },
   baseUrl: "http://localhost:8000",
   timeout: 45000, // Increased from 30000 to handle longer operations
-};;
+};
 
 /**
  * Launch browser with test configuration
@@ -27,13 +27,13 @@ export async function launchBrowser(options = {}) {
   const launchOptions = {
     headless: TEST_CONFIG.headless,
     args: [
-      "--no-sandbox", 
+      "--no-sandbox",
       "--disable-setuid-sandbox",
       "--disable-dev-shm-usage", // Helps with stability in containers
       "--disable-gpu", // Helps with stability in headless mode
       "--disable-extensions",
       "--no-first-run",
-      "--disable-default-apps"
+      "--disable-default-apps",
     ],
     ...options,
   };
@@ -110,14 +110,17 @@ export async function waitForElement(
  */
 export async function safeClick(page, selector, timeout = 5000) {
   await page.waitForSelector(selector, { visible: true, timeout });
-  
+
   // Add small delay to ensure element is stable
-  await new Promise(resolve => setTimeout(resolve, 100));
-  
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
   try {
     await page.click(selector);
   } catch (error) {
-    if (error.message.includes("Node is detached") || error.message.includes("Target closed")) {
+    if (
+      error.message.includes("Node is detached") ||
+      error.message.includes("Target closed")
+    ) {
       // Re-find element and try again
       await page.waitForSelector(selector, { visible: true, timeout: 2000 });
       await page.click(selector);
@@ -132,18 +135,21 @@ export async function safeClick(page, selector, timeout = 5000) {
  */
 export async function safeType(page, selector, text, options = {}) {
   await page.waitForSelector(selector, { visible: true, timeout: 5000 });
-  
+
   // Clear field first if specified
   if (options.clear) {
     await page.evaluate((sel) => {
       document.querySelector(sel).value = "";
     }, selector);
   }
-  
+
   try {
     await page.type(selector, text, { delay: 20 }); // Add delay between keystrokes
   } catch (error) {
-    if (error.message.includes("Node is detached") || error.message.includes("Target closed")) {
+    if (
+      error.message.includes("Node is detached") ||
+      error.message.includes("Target closed")
+    ) {
       // Re-find element and try again
       await page.waitForSelector(selector, { visible: true, timeout: 2000 });
       await page.type(selector, text, { delay: 20 });
@@ -160,38 +166,43 @@ export async function waitForStableElement(page, selector, timeout = 5000) {
   let lastBounds = null;
   let stableCount = 0;
   const startTime = Date.now();
-  
+
   while (Date.now() - startTime < timeout) {
     try {
       const element = await page.$(selector);
       if (!element) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         continue;
       }
-      
+
       const bounds = await element.boundingBox();
-      
-      if (lastBounds && 
-          bounds && 
-          Math.abs(bounds.x - lastBounds.x) < 1 && 
-          Math.abs(bounds.y - lastBounds.y) < 1) {
+
+      if (
+        lastBounds &&
+        bounds &&
+        Math.abs(bounds.x - lastBounds.x) < 1 &&
+        Math.abs(bounds.y - lastBounds.y) < 1
+      ) {
         stableCount++;
-        if (stableCount >= 3) { // Element stable for 3 checks
+        if (stableCount >= 3) {
+          // Element stable for 3 checks
           return element;
         }
       } else {
         stableCount = 0;
       }
-      
+
       lastBounds = bounds;
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     } catch (error) {
       // Element might be transitioning, continue waiting
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
   }
-  
-  throw new Error(`Element ${selector} did not become stable within ${timeout}ms`);
+
+  throw new Error(
+    `Element ${selector} did not become stable within ${timeout}ms`,
+  );
 }
 
 /**
@@ -200,7 +211,7 @@ export async function waitForStableElement(page, selector, timeout = 5000) {
 export async function smartDelay(headlessMs = 50, visualMs = 300) {
   const delay = TEST_CONFIG.headless ? headlessMs : visualMs;
   if (delay > 0) {
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
 }
 
@@ -211,7 +222,7 @@ export async function waitForDOMSettle(page) {
   // Simple smart delay based on headless mode
   const delay = TEST_CONFIG.headless ? 100 : 300;
   if (delay > 0) {
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
 }
 
@@ -220,19 +231,23 @@ export async function waitForDOMSettle(page) {
  */
 export async function waitForElementSmart(page, selector, options = {}) {
   const timeout = TEST_CONFIG.headless ? 5000 : 10000;
-  return page.waitForSelector(selector, { 
-    visible: true, 
-    timeout, 
-    ...options 
+  return page.waitForSelector(selector, {
+    visible: true,
+    timeout,
+    ...options,
   });
 }
 
 /**
  * Wait for a specific condition to be true
  */
-export async function waitForCondition(conditionFn, timeout = 5000, interval = 100) {
+export async function waitForCondition(
+  conditionFn,
+  timeout = 5000,
+  interval = 100,
+) {
   const startTime = Date.now();
-  
+
   while (Date.now() - startTime < timeout) {
     try {
       const result = await conditionFn();
@@ -242,23 +257,28 @@ export async function waitForCondition(conditionFn, timeout = 5000, interval = 1
     } catch (error) {
       // Condition not met yet, continue waiting
     }
-    
-    await new Promise(resolve => setTimeout(resolve, interval));
+
+    await new Promise((resolve) => setTimeout(resolve, interval));
   }
-  
+
   throw new Error(`Condition not met within ${timeout}ms`);
 }
 
 /**
  * Wait for element to have specific content/text
  */
-export async function waitForElementText(page, selector, expectedText, timeout = 5000) {
+export async function waitForElementText(
+  page,
+  selector,
+  expectedText,
+  timeout = 5000,
+) {
   return waitForCondition(async () => {
     try {
       const element = await page.$(selector);
       if (!element) return false;
-      
-      const text = await page.evaluate(el => el.textContent, element);
+
+      const text = await page.evaluate((el) => el.textContent, element);
       return text && text.includes(expectedText);
     } catch (error) {
       return false;
@@ -269,7 +289,12 @@ export async function waitForElementText(page, selector, expectedText, timeout =
 /**
  * Wait for element count to match expected
  */
-export async function waitForElementCount(page, selector, expectedCount, timeout = 5000) {
+export async function waitForElementCount(
+  page,
+  selector,
+  expectedCount,
+  timeout = 5000,
+) {
   return waitForCondition(async () => {
     try {
       const elements = await page.$$(selector);
@@ -292,17 +317,17 @@ export async function waitForDOMUpdate(page, timeout = 1000) {
       const observer = new MutationObserver(() => {
         mutationCount++;
       });
-      
+
       observer.observe(document.body, {
         childList: true,
         subtree: true,
-        attributes: true
+        attributes: true,
       });
-      
+
       // Give a small window for mutations to start
       setTimeout(() => {
         observer.disconnect();
-        
+
         // If no mutations happened, resolve immediately
         if (mutationCount === 0) {
           resolve();

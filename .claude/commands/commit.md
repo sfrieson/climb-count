@@ -10,6 +10,7 @@ Review the current git status and staged/unstaged changes, then commit with the 
 Arguments: $ARGUMENTS
 
 Steps:
+
 1. Check git status to see what changes exist
 2. Review staged and unstaged changes with git diff
 3. Add relevant files to staging if needed

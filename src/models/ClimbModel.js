@@ -264,7 +264,7 @@ export class ClimbModel {
    */
   async updateAttempt(sessionId, attemptId, updatedData) {
     // Find the session
-    const session = this.sessions.find(s => s.id === sessionId);
+    const session = this.sessions.find((s) => s.id === sessionId);
     if (!session) {
       // Check if it's in the current session
       if (this.currentSession && this.currentSession.id === sessionId) {
@@ -274,13 +274,16 @@ export class ClimbModel {
     }
 
     // Find the attempt
-    const attemptIndex = session.attempts.findIndex(a => a.id === attemptId);
+    const attemptIndex = session.attempts.findIndex((a) => a.id === attemptId);
     if (attemptIndex === -1) {
       throw new Error("Attempt not found");
     }
 
     // Validate updated data
-    if (updatedData.route && (updatedData.success === null || updatedData.success === undefined)) {
+    if (
+      updatedData.route &&
+      (updatedData.success === null || updatedData.success === undefined)
+    ) {
       throw new Error("Route and result are required");
     }
 
@@ -294,10 +297,10 @@ export class ClimbModel {
     };
 
     session.attempts[attemptIndex] = updatedAttempt;
-    
+
     // Save sessions to persistent storage
     await this.saveSessions();
-    
+
     return updatedAttempt;
   }
 
@@ -309,13 +312,18 @@ export class ClimbModel {
       throw new Error("No active session");
     }
 
-    const attemptIndex = this.currentSession.attempts.findIndex(a => a.id === attemptId);
+    const attemptIndex = this.currentSession.attempts.findIndex(
+      (a) => a.id === attemptId,
+    );
     if (attemptIndex === -1) {
       throw new Error("Attempt not found in current session");
     }
 
     // Validate updated data
-    if (updatedData.route && (updatedData.success === null || updatedData.success === undefined)) {
+    if (
+      updatedData.route &&
+      (updatedData.success === null || updatedData.success === undefined)
+    ) {
       throw new Error("Route and result are required");
     }
 
@@ -329,10 +337,10 @@ export class ClimbModel {
     };
 
     this.currentSession.attempts[attemptIndex] = updatedAttempt;
-    
+
     // Save draft since this is current session
     await this.saveDraft();
-    
+
     return updatedAttempt;
   }
 
@@ -341,7 +349,7 @@ export class ClimbModel {
    */
   async deleteAttempt(sessionId, attemptId) {
     // Find the session
-    const session = this.sessions.find(s => s.id === sessionId);
+    const session = this.sessions.find((s) => s.id === sessionId);
     if (!session) {
       // Check if it's in the current session
       if (this.currentSession && this.currentSession.id === sessionId) {
@@ -351,16 +359,16 @@ export class ClimbModel {
     }
 
     // Find and remove the attempt
-    const attemptIndex = session.attempts.findIndex(a => a.id === attemptId);
+    const attemptIndex = session.attempts.findIndex((a) => a.id === attemptId);
     if (attemptIndex === -1) {
       throw new Error("Attempt not found");
     }
 
     const deletedAttempt = session.attempts.splice(attemptIndex, 1)[0];
-    
+
     // Save sessions to persistent storage
     await this.saveSessions();
-    
+
     return deletedAttempt;
   }
 
@@ -372,16 +380,21 @@ export class ClimbModel {
       throw new Error("No active session");
     }
 
-    const attemptIndex = this.currentSession.attempts.findIndex(a => a.id === attemptId);
+    const attemptIndex = this.currentSession.attempts.findIndex(
+      (a) => a.id === attemptId,
+    );
     if (attemptIndex === -1) {
       throw new Error("Attempt not found in current session");
     }
 
-    const deletedAttempt = this.currentSession.attempts.splice(attemptIndex, 1)[0];
-    
+    const deletedAttempt = this.currentSession.attempts.splice(
+      attemptIndex,
+      1,
+    )[0];
+
     // Save draft since this is current session
     await this.saveDraft();
-    
+
     return deletedAttempt;
   }
 

@@ -164,10 +164,13 @@ export class RouteModel {
     const updatedRoute = {
       ...existingRoute,
       name: routeData.name !== undefined ? routeData.name : existingRoute.name,
-      color: routeData.color !== undefined ? routeData.color : existingRoute.color,
+      color:
+        routeData.color !== undefined ? routeData.color : existingRoute.color,
       gym: routeData.gym !== undefined ? routeData.gym : existingRoute.gym,
-      notes: routeData.notes !== undefined ? routeData.notes : existingRoute.notes,
-      image: routeData.image !== undefined ? routeData.image : existingRoute.image,
+      notes:
+        routeData.notes !== undefined ? routeData.notes : existingRoute.notes,
+      image:
+        routeData.image !== undefined ? routeData.image : existingRoute.image,
       updatedAt: new Date(),
     };
 

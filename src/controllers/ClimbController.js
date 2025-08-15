@@ -72,7 +72,7 @@ export class ClimbController {
     }
 
     const finishSessionBtn = document.querySelector(
-      "[onclick=\"finishSession()\"]",
+      '[onclick="finishSession()"]',
     );
     if (finishSessionBtn) {
       finishSessionBtn.onclick = async () => await this.finishSession();
@@ -293,7 +293,7 @@ export class ClimbController {
       return;
     }
 
-    const attempt = currentSession.attempts.find(a => a.id === attemptId);
+    const attempt = currentSession.attempts.find((a) => a.id === attemptId);
     if (!attempt) {
       this.view.showAlert("Attempt not found");
       return;
@@ -306,13 +306,13 @@ export class ClimbController {
    * Handle editing an attempt from a completed session
    */
   async handleEditAttemptFromSession(sessionId, attemptId) {
-    const session = this.model.getSessions().find(s => s.id === sessionId);
+    const session = this.model.getSessions().find((s) => s.id === sessionId);
     if (!session) {
       this.view.showAlert("Session not found");
       return;
     }
 
-    const attempt = session.attempts.find(a => a.id === attemptId);
+    const attempt = session.attempts.find((a) => a.id === attemptId);
     if (!attempt) {
       this.view.showAlert("Attempt not found");
       return;
@@ -331,7 +331,11 @@ export class ClimbController {
       return;
     }
 
-    if (confirm("Are you sure you want to delete this attempt? This action cannot be undone.")) {
+    if (
+      confirm(
+        "Are you sure you want to delete this attempt? This action cannot be undone.",
+      )
+    ) {
       try {
         await this.model.deleteAttemptFromCurrentSession(attemptId);
         this.refreshCurrentSessionView();
@@ -352,7 +356,7 @@ export class ClimbController {
 
     try {
       const routes = await this.routeController.model.getAllRoutes();
-      
+
       this.view.showEditAttemptModal(
         attempt,
         routes,
@@ -375,7 +379,7 @@ export class ClimbController {
           } catch (error) {
             this.view.showAlert("Error deleting attempt: " + error.message);
           }
-        }
+        },
       );
     } catch (error) {
       this.view.showAlert("Error loading routes: " + error.message);

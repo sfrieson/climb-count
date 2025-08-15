@@ -204,15 +204,17 @@ class RouteView {
     return new Promise((resolve) => {
       const overlay = document.createElement("div");
       overlay.className = "dialog-overlay";
-      
+
       const dialog = document.createElement("div");
       dialog.className = "dialog";
-      
-      const colorOptions = Object.keys(this.colorMap).map(color => {
-        const selected = color === route.color ? "selected" : "";
-        return `<div class="color-btn ${color} ${selected}" data-color="${color}">${color.charAt(0).toUpperCase() + color.slice(1)}</div>`;
-      }).join("");
-      
+
+      const colorOptions = Object.keys(this.colorMap)
+        .map((color) => {
+          const selected = color === route.color ? "selected" : "";
+          return `<div class="color-btn ${color} ${selected}" data-color="${color}">${color.charAt(0).toUpperCase() + color.slice(1)}</div>`;
+        })
+        .join("");
+
       dialog.innerHTML = `
         <div class="dialog-header">
           <h3>Edit Route</h3>
@@ -253,15 +255,15 @@ class RouteView {
           <button class="dialog-btn dialog-btn-primary" id="edit-save-btn">Save Changes</button>
         </div>
       `;
-      
+
       overlay.appendChild(dialog);
       document.body.appendChild(overlay);
-      
+
       // Handle image preview
       const imageInput = dialog.querySelector("#edit-route-image");
       const preview = dialog.querySelector("#edit-image-preview");
       const previewImg = dialog.querySelector("#edit-preview-img");
-      
+
       imageInput.addEventListener("change", (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -273,25 +275,27 @@ class RouteView {
           reader.readAsDataURL(file);
         }
       });
-      
+
       // Handle color selection
-      const colorButtons = dialog.querySelectorAll("#edit-route-colors .color-btn");
+      const colorButtons = dialog.querySelectorAll(
+        "#edit-route-colors .color-btn",
+      );
       let selectedColor = route.color;
-      
+
       colorButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
-          colorButtons.forEach(b => b.classList.remove("selected"));
+          colorButtons.forEach((b) => b.classList.remove("selected"));
           btn.classList.add("selected");
           selectedColor = btn.dataset.color;
         });
       });
-      
+
       // Handle buttons
       dialog.querySelector("#edit-cancel-btn").addEventListener("click", () => {
         document.body.removeChild(overlay);
         resolve(null);
       });
-      
+
       dialog.querySelector("#edit-save-btn").addEventListener("click", () => {
         const formData = {
           image: imageInput.files[0] || null,
@@ -300,11 +304,11 @@ class RouteView {
           gym: dialog.querySelector("#edit-route-gym").value.trim(),
           notes: dialog.querySelector("#edit-route-notes").value.trim(),
         };
-        
+
         document.body.removeChild(overlay);
         resolve(formData);
       });
-      
+
       // Close on overlay click
       overlay.addEventListener("click", (e) => {
         if (e.target === overlay) {

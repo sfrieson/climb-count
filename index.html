@@ -799,7 +799,8 @@
         gap: 10px;
       }
 
-      .edit-attempt-btn, .delete-attempt-btn {
+      .edit-attempt-btn,
+      .delete-attempt-btn {
         background: none;
         border: none;
         cursor: pointer;
@@ -822,7 +823,7 @@
 
       .timeline-attempt:hover {
         transform: scale(1.1);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       }
 
       /* Modal Styles */
@@ -986,9 +987,7 @@
     </div>
 
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('log')">
-        Log Session
-      </button>
+      <button class="tab active" onclick="switchTab('log')">Log Session</button>
       <button class="tab" onclick="switchTab('routes')">Add Route</button>
       <button class="tab" onclick="switchTab('sessions')">Sessions</button>
       <button class="tab" onclick="switchTab('stats')">Statistics</button>
