@@ -183,7 +183,7 @@ describe("Application Basic Functionality", () => {
         model.addAttemptToCurrentSession({
           route: { id: 1, color: "red" },
           success: true,
-        }),
+        })
       ).toThrow("No active session");
 
       // Should throw error when finishing session with no attempts
@@ -223,7 +223,7 @@ describe("Application Basic Functionality", () => {
 
       async deleteRoute(id) {
         const index = this.routes.findIndex(
-          (route) => route.id === parseInt(id),
+          (route) => route.id === parseInt(id)
         );
         if (index > -1) {
           this.routes.splice(index, 1);
@@ -321,7 +321,7 @@ describe("Application Basic Functionality", () => {
       };
 
       expect(validateSessionData({ date: "2023-01-01", gym: "Test Gym" })).toBe(
-        true,
+        true
       );
       expect(() => validateSessionData({ date: "2023-01-01" })).toThrow();
       expect(() => validateSessionData({ gym: "Test Gym" })).toThrow();
@@ -344,7 +344,7 @@ describe("Application Basic Functionality", () => {
         validateAttemptData({
           route: { id: 1, color: "red" },
           success: true,
-        }),
+        })
       ).toBe(true);
 
       expect(() => validateAttemptData({ success: true })).toThrow();

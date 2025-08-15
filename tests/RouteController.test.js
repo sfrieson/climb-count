@@ -100,7 +100,7 @@ const fs = require("fs");
 const path = require("path");
 const controllerPath = path.join(
   __dirname,
-  "../controllers/RouteController.js",
+  "../controllers/RouteController.js"
 );
 const controllerSource = fs.readFileSync(controllerPath, "utf8");
 
@@ -334,7 +334,7 @@ describe("RouteController", () => {
       await controller.deleteRoute(1);
 
       expect(mockView.alertMessage).toBe(
-        "Failed to delete route: Delete failed",
+        "Failed to delete route: Delete failed"
       );
     });
   });
@@ -372,7 +372,7 @@ describe("RouteController", () => {
 
       expect(mockImageInput.addEventListener).toHaveBeenCalledWith(
         "change",
-        expect.any(Function),
+        expect.any(Function)
       );
     });
 
@@ -415,7 +415,7 @@ describe("RouteController", () => {
       mockColorButtons.forEach((btn) => {
         expect(btn.addEventListener).toHaveBeenCalledWith(
           "click",
-          expect.any(Function),
+          expect.any(Function)
         );
       });
     });

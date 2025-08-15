@@ -100,7 +100,7 @@ export async function navigateToApp(page, path = "") {
 export async function waitForElement(
   page,
   selector,
-  timeout = TEST_CONFIG.timeout,
+  timeout = TEST_CONFIG.timeout
 ) {
   await page.waitForSelector(selector, { visible: true, timeout });
 }
@@ -201,7 +201,7 @@ export async function waitForStableElement(page, selector, timeout = 5000) {
   }
 
   throw new Error(
-    `Element ${selector} did not become stable within ${timeout}ms`,
+    `Element ${selector} did not become stable within ${timeout}ms`
   );
 }
 
@@ -244,7 +244,7 @@ export async function waitForElementSmart(page, selector, options = {}) {
 export async function waitForCondition(
   conditionFn,
   timeout = 5000,
-  interval = 100,
+  interval = 100
 ) {
   const startTime = Date.now();
 
@@ -271,7 +271,7 @@ export async function waitForElementText(
   page,
   selector,
   expectedText,
-  timeout = 5000,
+  timeout = 5000
 ) {
   return waitForCondition(async () => {
     try {
@@ -293,7 +293,7 @@ export async function waitForElementCount(
   page,
   selector,
   expectedCount,
-  timeout = 5000,
+  timeout = 5000
 ) {
   return waitForCondition(async () => {
     try {
@@ -415,6 +415,6 @@ export async function waitForAppReady(page) {
       const app = document.querySelector("#app");
       return app && app.children.length > 0;
     },
-    { timeout: TEST_CONFIG.timeout },
+    { timeout: TEST_CONFIG.timeout }
   );
 }

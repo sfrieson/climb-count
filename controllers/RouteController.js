@@ -33,7 +33,7 @@ class RouteController {
 
     // Route color selection
     const colorButtons = document.querySelectorAll(
-      "#route-colors-add .color-btn",
+      "#route-colors-add .color-btn"
     );
     colorButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -84,7 +84,7 @@ class RouteController {
 
       // Convert image to ArrayBuffer for IndexedDB storage
       const imageArrayBuffer = await this.model.fileToArrayBuffer(
-        formData.image,
+        formData.image
       );
 
       const routeData = {

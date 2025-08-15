@@ -16,7 +16,7 @@ class ClimbView {
   setCurrentDateTime() {
     const now = new Date();
     const localDateTime = new Date(
-      now.getTime() - now.getTimezoneOffset() * 60000,
+      now.getTime() - now.getTimezoneOffset() * 60000
     );
     document.getElementById("session-date").value = localDateTime
       .toISOString()
@@ -53,10 +53,10 @@ class ClimbView {
                 <div>
                     ${routeInfo}
                     ${
-  attempt.notes
-    ? `<br><small>Notes: ${attempt.notes}</small>`
-    : ""
-}
+                      attempt.notes
+                        ? `<br><small>Notes: ${attempt.notes}</small>`
+                        : ""
+                    }
                 </div>
                 <div class="attempt-actions">
                     ${attempt.success ? "✅ Success" : "❌ Failed"}
@@ -179,11 +179,11 @@ class ClimbView {
         const rate = ((stats.success / stats.total) * 100).toFixed(1);
         return `
                     <div class="stat-card" style="border-left: 5px solid ${this.getColorHex(
-    color,
-  )};">
+                      color
+                    )};">
                         <div style="font-weight: bold; color: ${this.getColorHex(
-    color,
-  )};">${color.toUpperCase()}</div>
+                          color
+                        )};">${color.toUpperCase()}</div>
                         <div class="stat-number">${rate}%</div>
                         <div>${stats.success}/${stats.total} attempts</div>
                     </div>
@@ -231,7 +231,7 @@ class ClimbView {
       const colorCounts = {};
       colors.forEach((color) => {
         colorCounts[color] = session.attempts.filter(
-          (a) => (a.route ? a.route.color : a.color) === color,
+          (a) => (a.route ? a.route.color : a.color) === color
         ).length;
       });
       return {
@@ -257,7 +257,7 @@ class ClimbView {
       chartHeight,
       sessionData,
       colors,
-      maxAttempts,
+      maxAttempts
     );
     this.drawChartLabels(ctx, canvas, padding, chartWidth, sessionData);
     this.drawChartLegend(ctx, canvas, padding, colors);
@@ -291,7 +291,7 @@ class ClimbView {
     chartHeight,
     sessionData,
     colors,
-    maxAttempts,
+    maxAttempts
   ) {
     if (sessionData.length >= 1) {
       colors.forEach((color, colorIndex) => {
@@ -329,7 +329,7 @@ class ClimbView {
           padding,
           chartHeight,
           maxAttempts,
-          color,
+          color
         );
       });
     }
@@ -344,7 +344,7 @@ class ClimbView {
     padding,
     chartHeight,
     maxAttempts,
-    color,
+    color
   ) {
     if (sessionData.length > 1 && points.some((p) => p.cumulativeCount > 0)) {
       ctx.beginPath();
@@ -446,8 +446,8 @@ class ClimbView {
         const rate = ((stats.success / stats.total) * 100).toFixed(0);
         return `<span style="color: ${this.getColorHex(color)};">
                     <strong>${color.toUpperCase()}</strong>: ${stats.success}/${
-  stats.total
-} (${rate}%)
+                      stats.total
+                    } (${rate}%)
                 </span>`;
       })
       .join(" | ");
@@ -466,12 +466,12 @@ class ClimbView {
           : "Unknown Route";
         return `<span class="timeline-attempt" data-session-id="${session.id}" data-attempt-id="${attempt.id}" 
                       title="${routeName} (${attemptColor}) - ${
-  attempt.success ? "Success" : "Failed"
-} - Click to edit" 
+                        attempt.success ? "Success" : "Failed"
+                      } - Click to edit" 
                       style="display: inline-block; margin: 2px; padding: 4px 6px; 
                              background: ${color}; color: ${
-  attemptColor === "white" ? "black" : "white"
-}; 
+                               attemptColor === "white" ? "black" : "white"
+                             }; 
                              border-radius: 4px; font-size: 12px; cursor: pointer;
                              position: relative;">
                         ${symbol}
@@ -492,7 +492,7 @@ class ClimbView {
 
   getFormData() {
     const selectedRoute = document.querySelector(
-      ".route-selector-item.selected",
+      ".route-selector-item.selected"
     );
     return {
       sessionDate: document.getElementById("session-date").value,
@@ -530,7 +530,7 @@ class ClimbView {
 
     // Clear existing route items but keep the "Add New Route" button
     const routeItems = container.querySelectorAll(
-      ".route-selector-item:not(.add-route-option)",
+      ".route-selector-item:not(.add-route-option)"
     );
     routeItems.forEach((item) => item.remove());
 
@@ -701,7 +701,7 @@ class ClimbView {
           // Use custom dialog instead of browser confirm
           const confirmed = await dialogUtils.showConfirm(
             "Are you sure you want to delete this attempt? This action cannot be undone.",
-            "Delete Attempt",
+            "Delete Attempt"
           );
 
           if (confirmed) {

@@ -80,7 +80,7 @@ describe("Route Upload - Critical Path", () => {
 
     // Verify color is selected
     const selectedColor = await page.$(
-      '#route-colors-add [data-color="red"].selected',
+      '#route-colors-add [data-color="red"].selected'
     );
     expect(selectedColor).not.toBeNull();
 
@@ -105,14 +105,14 @@ describe("Route Upload - Critical Path", () => {
     // Step 6: Verify route appears in the routes list
     const routeCards = await page.$$eval(
       "#routes-container .route-card",
-      (cards) => cards.map((card) => card.textContent),
+      (cards) => cards.map((card) => card.textContent)
     );
 
     const foundRoute = routeCards.some(
       (cardText) =>
         cardText.includes(routeName) &&
         cardText.includes("RED") &&
-        cardText.includes("Test Climbing Gym"),
+        cardText.includes("Test Climbing Gym")
     );
 
     expect(foundRoute).toBe(true);
@@ -120,7 +120,7 @@ describe("Route Upload - Critical Path", () => {
     // Verify the image is displayed
     const imageSrc = await page.$eval(
       "#routes-container .route-card .route-image img",
-      (img) => img.src,
+      (img) => img.src
     );
     expect(imageSrc).toBeTruthy();
     expect(imageSrc).not.toContain("No Image"); // Should not be the placeholder
@@ -128,7 +128,7 @@ describe("Route Upload - Critical Path", () => {
     // Verify color indicator is correct (red)
     const colorStyle = await page.$eval(
       "#routes-container .route-card .route-color-indicator",
-      (el) => el.getAttribute("style"),
+      (el) => el.getAttribute("style")
     );
     expect(colorStyle).toContain("#F44336"); // Red color hex
   });
@@ -147,7 +147,7 @@ describe("Route Upload - Critical Path", () => {
       // Upload photo
       const photoPath = path.resolve(
         __dirname,
-        `../../route_photos/route_${(i % 5) + 1}.png`,
+        `../../route_photos/route_${(i % 5) + 1}.png`
       );
       const fileInput = await page.$("#route-image");
       await fileInput.uploadFile(photoPath);
@@ -192,7 +192,7 @@ describe("Route Upload - Critical Path", () => {
             card
               .querySelector(".route-color-indicator")
               ?.getAttribute("style") || "",
-        })),
+        }))
     );
 
     expect(routeCards.length).toBeGreaterThanOrEqual(colors.length);
@@ -203,7 +203,7 @@ describe("Route Upload - Critical Path", () => {
       const foundRoute = routeCards.some(
         (card) =>
           card.text.includes(expectedName) &&
-          card.text.includes(color.toUpperCase()),
+          card.text.includes(color.toUpperCase())
       );
       expect(foundRoute).toBe(true);
     });
@@ -237,11 +237,11 @@ describe("Route Upload - Critical Path", () => {
     // Check if route was NOT added (since no color selected)
     const routeCards = await page.$$eval(
       "#routes-container .route-card",
-      (cards) => cards.map((card) => card.textContent),
+      (cards) => cards.map((card) => card.textContent)
     );
 
     const foundInvalidRoute = routeCards.some((cardText) =>
-      cardText.includes(routeName),
+      cardText.includes(routeName)
     );
     // This test assumes the app validates and doesn't save routes without color
     expect(foundInvalidRoute).toBe(false);
@@ -282,11 +282,11 @@ describe("Route Upload - Critical Path", () => {
     // Find and verify the specific route we created
     const routeCards = await page.$$eval(
       "#routes-container .route-card",
-      (cards) => cards.map((card) => card.textContent),
+      (cards) => cards.map((card) => card.textContent)
     );
 
     const ourRouteCard = routeCards.find((cardText) =>
-      cardText.includes(routeName),
+      cardText.includes(routeName)
     );
     expect(ourRouteCard).toBeDefined();
     expect(ourRouteCard).toContain("PURPLE");
@@ -296,10 +296,10 @@ describe("Route Upload - Critical Path", () => {
 
     // Verify action buttons are present on any route card (they should all have them)
     const editButton = await page.$(
-      "#routes-container .route-card .edit-route-btn",
+      "#routes-container .route-card .edit-route-btn"
     );
     const deleteButton = await page.$(
-      "#routes-container .route-card .delete-route-btn",
+      "#routes-container .route-card .delete-route-btn"
     );
 
     expect(editButton).not.toBeNull();

@@ -187,10 +187,10 @@ describe("ClimbView", () => {
       view.selectRoute("1");
 
       expect(mockRouteElements[0].classList.remove).toHaveBeenCalledWith(
-        "selected",
+        "selected"
       );
       expect(mockRouteElements[1].classList.remove).toHaveBeenCalledWith(
-        "selected",
+        "selected"
       );
     });
   });

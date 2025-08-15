@@ -14,7 +14,7 @@ The `DialogUtils` class provides:
   ```javascript
   const confirmed = await dialogUtils.showConfirm(
     "Delete this route?",
-    "Confirm Deletion",
+    "Confirm Deletion"
   );
   if (confirmed) {
     // User clicked Confirm

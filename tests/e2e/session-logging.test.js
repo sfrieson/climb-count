@@ -71,7 +71,7 @@ describe("Session Logging - Critical Path", () => {
 
     const photoPath2 = path.resolve(
       __dirname,
-      "../../route_photos/route_2.png",
+      "../../route_photos/route_2.png"
     );
     const fileInput2 = await page.$("#route-image");
     await fileInput2.uploadFile(photoPath2);
@@ -113,19 +113,19 @@ describe("Session Logging - Critical Path", () => {
     // Step 2: Wait for routes to load and select first route
     await waitForElementSmart(
       page,
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
     await smartDelay(100, 500); // Much shorter delay in headless
 
     // Get fresh route items each time to avoid stale elements
     let routeItems = await page.$$(
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
     expect(routeItems.length).toBeGreaterThan(0);
 
     await safeClick(
       page,
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
 
     // Wait for route selection to complete
@@ -157,18 +157,18 @@ describe("Session Logging - Critical Path", () => {
     // Verify the attempt shows success
     const attemptText = await page.$eval(
       "#session-attempts .attempt-item",
-      (el) => el.textContent,
+      (el) => el.textContent
     );
     expect(attemptText).toContain("Success");
 
     // Step 5: Log second attempt on different route (FAILED)
     routeItems = await page.$$(
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
     if (routeItems.length > 1) {
       await safeClick(
         page,
-        '.route-selector-item[data-route-id]:not([data-route-id="add-new"]):not(.selected)',
+        '.route-selector-item[data-route-id]:not([data-route-id="add-new"]):not(.selected)'
       );
     }
     await safeClick(page, "#failure-btn");
@@ -177,7 +177,7 @@ describe("Session Logging - Critical Path", () => {
       page,
       "#notes",
       "Second attempt - struggled with the holds",
-      { clear: true },
+      { clear: true }
     );
 
     await safeClick(page, "#log-attempt-btn");
@@ -192,13 +192,13 @@ describe("Session Logging - Critical Path", () => {
     // Set up a session with one attempt
     await waitForElementSmart(
       page,
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
     await smartDelay(100, 500);
 
     await safeClick(
       page,
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
     await page.waitForSelector(".route-selector-item.selected", {
       visible: true,
@@ -216,7 +216,7 @@ describe("Session Logging - Critical Path", () => {
     // Verify attempt is logged as success
     let attemptText = await page.$eval(
       "#session-attempts .attempt-item",
-      (el) => el.textContent,
+      (el) => el.textContent
     );
     expect(attemptText).toContain("Success");
 
@@ -239,7 +239,7 @@ describe("Session Logging - Critical Path", () => {
       page,
       "#edit-notes",
       "Actually I fell on this one - correcting to failed",
-      { clear: true },
+      { clear: true }
     );
 
     // Step 5: Save changes
@@ -255,7 +255,7 @@ describe("Session Logging - Critical Path", () => {
     // Step 6: Verify attempt is now marked as failed
     attemptText = await page.$eval(
       "#session-attempts .attempt-item",
-      (el) => el.textContent,
+      (el) => el.textContent
     );
     expect(attemptText).toContain("Failed");
     // The notes appear to be truncated in the UI display, so just check that it changed from Success to Failed
@@ -268,14 +268,14 @@ describe("Session Logging - Critical Path", () => {
     // Create a complete session with multiple attempts
     await waitForElementSmart(
       page,
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
     await smartDelay(100, 500);
 
     // Log 3 attempts: 2 success, 1 failed
     await safeClick(
       page,
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
     await page.waitForSelector(".route-selector-item.selected", {
       visible: true,
@@ -287,17 +287,17 @@ describe("Session Logging - Critical Path", () => {
 
     // Get fresh route items to avoid stale elements
     const routeItems = await page.$$(
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
     if (routeItems.length > 1) {
       await safeClick(
         page,
-        '.route-selector-item[data-route-id]:not([data-route-id="add-new"]):not(.selected)',
+        '.route-selector-item[data-route-id]:not([data-route-id="add-new"]):not(.selected)'
       );
     } else {
       await safeClick(
         page,
-        '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+        '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
       );
     }
     await safeClick(page, "#failure-btn");
@@ -307,7 +307,7 @@ describe("Session Logging - Critical Path", () => {
 
     await safeClick(
       page,
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
     await safeClick(page, "#success-btn");
     await safeType(page, "#notes", "Back to first route - success again", {
@@ -338,7 +338,7 @@ describe("Session Logging - Critical Path", () => {
 
     const sessionText = await page.evaluate(
       (el) => el.textContent,
-      sessionItem,
+      sessionItem
     );
     expect(sessionText).toContain("Test Gym");
     expect(sessionText).toContain("2/3"); // 2 successes out of 3 total
@@ -348,13 +348,13 @@ describe("Session Logging - Critical Path", () => {
     // Create and finish a session first
     await waitForElementSmart(
       page,
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
     await smartDelay(100, 500);
 
     await safeClick(
       page,
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
     await page.waitForSelector(".route-selector-item.selected", {
       visible: true,
@@ -389,7 +389,7 @@ describe("Session Logging - Critical Path", () => {
       page,
       "#edit-notes",
       "Edited from completed session - changed to failed",
-      { clear: true },
+      { clear: true }
     );
 
     // Save changes
@@ -400,7 +400,7 @@ describe("Session Logging - Critical Path", () => {
     const sessionItem = await page.$("#session-list .session-item");
     const sessionText = await page.evaluate(
       (el) => el.textContent,
-      sessionItem,
+      sessionItem
     );
     expect(sessionText).toContain("0/1"); // Should now be 0 successes out of 1 total
     expect(sessionText).toContain("0.0%"); // 0% success rate
@@ -410,18 +410,18 @@ describe("Session Logging - Critical Path", () => {
     // Create a comprehensive session with different colored routes
     await waitForElementSmart(
       page,
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
     await smartDelay(100, 500);
     const routeItems = await page.$$(
-      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+      '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
     );
 
     // Log attempts on different colored routes
     for (let i = 0; i < Math.min(routeItems.length, 2); i++) {
       await safeClick(
         page,
-        '.route-selector-item[data-route-id]:not([data-route-id="add-new"])',
+        '.route-selector-item[data-route-id]:not([data-route-id="add-new"])'
       );
       await page.waitForSelector(".route-selector-item.selected", {
         visible: true,

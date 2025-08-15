@@ -46,7 +46,7 @@ export class ClimbModel {
         const oldVersion = event.oldVersion;
 
         console.log(
-          `Upgrading database from version ${oldVersion} to ${this.#version}`,
+          `Upgrading database from version ${oldVersion} to ${this.#version}`
         );
 
         // Create sessions store if it doesn't exist
@@ -152,7 +152,7 @@ export class ClimbModel {
     return new Promise((resolve, reject) => {
       const transaction = this.#db.transaction(
         [this.#sessionsStore],
-        "readonly",
+        "readonly"
       );
       const store = transaction.objectStore(this.#sessionsStore);
       const request = store.getAll();
@@ -185,7 +185,7 @@ export class ClimbModel {
     return new Promise((resolve, reject) => {
       const transaction = this.#db.transaction(
         [this.#sessionsStore],
-        "readwrite",
+        "readwrite"
       );
       const store = transaction.objectStore(this.#sessionsStore);
 
@@ -313,7 +313,7 @@ export class ClimbModel {
     }
 
     const attemptIndex = this.currentSession.attempts.findIndex(
-      (a) => a.id === attemptId,
+      (a) => a.id === attemptId
     );
     if (attemptIndex === -1) {
       throw new Error("Attempt not found in current session");
@@ -381,7 +381,7 @@ export class ClimbModel {
     }
 
     const attemptIndex = this.currentSession.attempts.findIndex(
-      (a) => a.id === attemptId,
+      (a) => a.id === attemptId
     );
     if (attemptIndex === -1) {
       throw new Error("Attempt not found in current session");
@@ -389,7 +389,7 @@ export class ClimbModel {
 
     const deletedAttempt = this.currentSession.attempts.splice(
       attemptIndex,
-      1,
+      1
     )[0];
 
     // Save draft since this is current session
@@ -428,7 +428,7 @@ export class ClimbModel {
     const allAttempts = this.getAllAttempts();
     const totalAttempts = allAttempts.length;
     const totalSuccess = allAttempts.filter(
-      (attempt) => attempt.success,
+      (attempt) => attempt.success
     ).length;
     const overallSuccessRate =
       totalAttempts > 0 ? ((totalSuccess / totalAttempts) * 100).toFixed(1) : 0;
@@ -474,7 +474,7 @@ export class ClimbModel {
     return new Promise((resolve, reject) => {
       const transaction = this.#db.transaction(
         [this.#draftsStore],
-        "readwrite",
+        "readwrite"
       );
       const store = transaction.objectStore(this.#draftsStore);
       const request = store.put({ id: "current", ...this.currentSession });
@@ -526,7 +526,7 @@ export class ClimbModel {
     return new Promise((resolve, reject) => {
       const transaction = this.#db.transaction(
         [this.#draftsStore],
-        "readwrite",
+        "readwrite"
       );
       const store = transaction.objectStore(this.#draftsStore);
       const request = store.delete("current");

@@ -52,7 +52,7 @@ class RouteView {
    */
   getSelectedRouteColor() {
     const selectedBtn = document.querySelector(
-      "#route-colors-add .color-btn.selected",
+      "#route-colors-add .color-btn.selected"
     );
     return selectedBtn ? selectedBtn.dataset.color : null;
   }
@@ -278,7 +278,7 @@ class RouteView {
 
       // Handle color selection
       const colorButtons = dialog.querySelectorAll(
-        "#edit-route-colors .color-btn",
+        "#edit-route-colors .color-btn"
       );
       let selectedColor = route.color;
 

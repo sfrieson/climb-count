@@ -72,7 +72,7 @@ export class ClimbController {
     }
 
     const finishSessionBtn = document.querySelector(
-      "[onclick=\"finishSession()\"]",
+      '[onclick="finishSession()"]'
     );
     if (finishSessionBtn) {
       finishSessionBtn.onclick = async () => await this.finishSession();
@@ -97,7 +97,7 @@ export class ClimbController {
         } else {
           console.error("Route not found for ID:", routeId);
           this.view.showAlert(
-            "Route not found. Please try again or add a new route.",
+            "Route not found. Please try again or add a new route."
           );
           // Clear the visual selection since the route wasn't found
           this.selectedRoute = null;
@@ -267,7 +267,7 @@ export class ClimbController {
     if (
       !(await dialogUtils.showConfirm(
         "Are you sure you want to clear the current session? All unsaved attempts will be lost.",
-        "Clear Session",
+        "Clear Session"
       ))
     ) {
       return;
@@ -333,7 +333,7 @@ export class ClimbController {
 
     if (
       confirm(
-        "Are you sure you want to delete this attempt? This action cannot be undone.",
+        "Are you sure you want to delete this attempt? This action cannot be undone."
       )
     ) {
       try {
@@ -379,7 +379,7 @@ export class ClimbController {
           } catch (error) {
             this.view.showAlert("Error deleting attempt: " + error.message);
           }
-        },
+        }
       );
     } catch (error) {
       this.view.showAlert("Error loading routes: " + error.message);

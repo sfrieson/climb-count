@@ -25,14 +25,14 @@ window.finishSession = async function () {
   // Check if app is initialized
   if (!app || !app.controller) {
     dialogUtils.showError(
-      "Application is still loading. Please wait a moment and try again.",
+      "Application is still loading. Please wait a moment and try again."
     );
     return;
   }
 
   const confirmed = await dialogUtils.showConfirm(
     "Are you sure you want to finish this session? This will save your current progress and start a new session.",
-    "Finish Session",
+    "Finish Session"
   );
 
   if (confirmed) {
@@ -43,7 +43,7 @@ window.finishSession = async function () {
 window.clearSession = async function () {
   const confirmed = await dialogUtils.showConfirm(
     "Are you sure you want to clear this session? This will permanently delete all unsaved climb data.",
-    "Clear Session",
+    "Clear Session"
   );
 
   if (confirmed && app && app.controller) {
@@ -170,7 +170,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         function (registration) {
           console.log(
             "ServiceWorker registration successful with scope: ",
-            registration.scope,
+            registration.scope
           );
 
           // Listen for updates
@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         },
         function (err) {
           console.log("ServiceWorker registration failed: ", err);
-        },
+        }
       );
     });
   }
@@ -206,7 +206,7 @@ async function showUpdateNotification() {
   if (
     await dialogUtils.showConfirm(
       "A new version of Climb Count is available. Would you like to update now?",
-      "Update Available",
+      "Update Available"
     )
   ) {
     // Tell the service worker to skip waiting and take control

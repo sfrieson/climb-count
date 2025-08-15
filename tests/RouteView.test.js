@@ -109,7 +109,7 @@ describe("RouteView", () => {
       view.showImagePreview(mockFile);
 
       expect(mockElements["preview-img"].src).toBe(
-        "data:image/jpeg;base64,test",
+        "data:image/jpeg;base64,test"
       );
       expect(mockElements["image-preview"].style.display).toBe("block");
     });
@@ -145,16 +145,16 @@ describe("RouteView", () => {
 
       // Should remove selected class from all buttons
       expect(mockColorButtons[0].classList.remove).toHaveBeenCalledWith(
-        "selected",
+        "selected"
       );
       expect(mockColorButtons[1].classList.remove).toHaveBeenCalledWith(
-        "selected",
+        "selected"
       );
 
       // Should add selected class to specific button
       expect(mockSelectedButton.classList.add).toHaveBeenCalledWith("selected");
       expect(mockDOM.document.querySelector).toHaveBeenCalledWith(
-        '#route-colors-add [data-color="red"]',
+        '#route-colors-add [data-color="red"]'
       );
     });
   });
@@ -171,7 +171,7 @@ describe("RouteView", () => {
 
       expect(color).toBe("blue");
       expect(mockDOM.document.querySelector).toHaveBeenCalledWith(
-        "#route-colors-add .color-btn.selected",
+        "#route-colors-add .color-btn.selected"
       );
     });
 
@@ -237,10 +237,10 @@ describe("RouteView", () => {
 
       // Should remove selected class from color buttons
       expect(mockColorButtons[0].classList.remove).toHaveBeenCalledWith(
-        "selected",
+        "selected"
       );
       expect(mockColorButtons[1].classList.remove).toHaveBeenCalledWith(
-        "selected",
+        "selected"
       );
     });
   });
@@ -343,7 +343,7 @@ describe("RouteView", () => {
       view.updateRouteCardImage(1, "new-image-url");
 
       expect(mockDOM.document.querySelector).toHaveBeenCalledWith(
-        '[data-route-id="1"]',
+        '[data-route-id="1"]'
       );
     });
   });
@@ -373,7 +373,7 @@ describe("RouteView", () => {
       view.removeRouteCard(1);
 
       expect(mockDOM.document.querySelector).toHaveBeenCalledWith(
-        '[data-route-id="1"]',
+        '[data-route-id="1"]'
       );
       expect(mockRouteCard.remove).toHaveBeenCalled();
     });

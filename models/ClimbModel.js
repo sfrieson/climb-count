@@ -94,7 +94,7 @@ class ClimbModel {
     const allAttempts = this.getAllAttempts();
     const totalAttempts = allAttempts.length;
     const totalSuccess = allAttempts.filter(
-      (attempt) => attempt.success,
+      (attempt) => attempt.success
     ).length;
     const overallSuccessRate =
       totalAttempts > 0 ? ((totalSuccess / totalAttempts) * 100).toFixed(1) : 0;

@@ -51,7 +51,7 @@ class ClimbController {
     }
 
     const finishSessionBtn = document.querySelector(
-      '[onclick="finishSession()"]',
+      '[onclick="finishSession()"]'
     );
     if (finishSessionBtn) {
       finishSessionBtn.onclick = () => this.finishSession();
@@ -76,7 +76,7 @@ class ClimbController {
         } else {
           console.error("Route not found for ID:", routeId);
           this.view.showAlert(
-            "Route not found. Please try again or add a new route.",
+            "Route not found. Please try again or add a new route."
           );
           // Clear the visual selection since the route wasn't found
           this.selectedRoute = null;
@@ -230,7 +230,7 @@ class ClimbController {
     // Ask for confirmation before clearing
     if (
       !confirm(
-        "Are you sure you want to clear the current session? All unsaved attempts will be lost.",
+        "Are you sure you want to clear the current session? All unsaved attempts will be lost."
       )
     ) {
       return;

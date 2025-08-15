@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
         function (registration) {
           console.log(
             "ServiceWorker registration successful with scope: ",
-            registration.scope,
+            registration.scope
           );
 
           // Listen for updates
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
         },
         function (err) {
           console.log("ServiceWorker registration failed: ", err);
-        },
+        }
       );
     });
   }
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function showUpdateNotification() {
   if (
     confirm(
-      "A new version of Climb Count is available. Would you like to update now?",
+      "A new version of Climb Count is available. Would you like to update now?"
     )
   ) {
     // Tell the service worker to skip waiting and take control

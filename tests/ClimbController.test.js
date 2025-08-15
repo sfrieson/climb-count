@@ -120,7 +120,7 @@ const fs = require("fs");
 const path = require("path");
 const controllerPath = path.join(
   __dirname,
-  "../controllers/ClimbController.js",
+  "../controllers/ClimbController.js"
 );
 const controllerSource = fs.readFileSync(controllerPath, "utf8");
 
@@ -285,7 +285,7 @@ describe("ClimbController", () => {
 
       expect(mockModel.currentSession.attempts).toHaveLength(1);
       expect(mockModel.currentSession.attempts[0].route).toBe(
-        controller.selectedRoute,
+        controller.selectedRoute
       );
       expect(mockModel.currentSession.attempts[0].success).toBe(true);
       expect(controller.refreshCurrentSessionView).toHaveBeenCalled();

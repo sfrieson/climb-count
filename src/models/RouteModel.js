@@ -34,7 +34,7 @@ export class RouteModel {
           } catch (error) {
             console.warn(
               "RouteModel could not request storage persistence:",
-              error,
+              error
             );
           }
         }
@@ -47,7 +47,7 @@ export class RouteModel {
         const oldVersion = event.oldVersion;
 
         console.log(
-          `Upgrading RouteModel database from version ${oldVersion} to ${this.#version}`,
+          `Upgrading RouteModel database from version ${oldVersion} to ${this.#version}`
         );
 
         // All stores are created by ClimbModel during upgrade

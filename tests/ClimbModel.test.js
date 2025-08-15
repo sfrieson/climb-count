@@ -38,7 +38,7 @@ describe("ClimbModel", () => {
       const sessionData = { gym: "Test Gym" };
 
       expect(() => model.startNewSession(sessionData)).toThrow(
-        "Session date and gym/location are required",
+        "Session date and gym/location are required"
       );
     });
 
@@ -46,7 +46,7 @@ describe("ClimbModel", () => {
       const sessionData = { date: "2023-01-15T10:30" };
 
       expect(() => model.startNewSession(sessionData)).toThrow(
-        "Session date and gym/location are required",
+        "Session date and gym/location are required"
       );
     });
   });
@@ -80,7 +80,7 @@ describe("ClimbModel", () => {
       const attemptData = { success: true };
 
       expect(() => model.addAttemptToCurrentSession(attemptData)).toThrow(
-        "Route and result are required",
+        "Route and result are required"
       );
     });
 
@@ -90,7 +90,7 @@ describe("ClimbModel", () => {
       };
 
       expect(() => model.addAttemptToCurrentSession(attemptData)).toThrow(
-        "Route and result are required",
+        "Route and result are required"
       );
     });
 
@@ -102,7 +102,7 @@ describe("ClimbModel", () => {
       };
 
       expect(() => model.addAttemptToCurrentSession(attemptData)).toThrow(
-        "No active session",
+        "No active session"
       );
     });
   });
@@ -130,7 +130,7 @@ describe("ClimbModel", () => {
 
     test("should throw error when no current session", () => {
       expect(() => model.finishCurrentSession()).toThrow(
-        "No session to finish or no attempts logged",
+        "No session to finish or no attempts logged"
       );
     });
 
@@ -142,7 +142,7 @@ describe("ClimbModel", () => {
       model.startNewSession(sessionData);
 
       expect(() => model.finishCurrentSession()).toThrow(
-        "No session to finish or no attempts logged",
+        "No session to finish or no attempts logged"
       );
     });
   });

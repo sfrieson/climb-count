@@ -27,7 +27,7 @@ self.addEventListener("install", (event) => {
         console.log("Service Worker: Caching Files");
         return cache.addAll(urlsToCache);
       })
-      .then(() => self.skipWaiting()),
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -47,14 +47,14 @@ self.addEventListener("activate", (event) => {
               console.log("Service Worker: Deleting Old Cache:", cacheName);
               return caches.delete(cacheName);
             }
-          }),
+          })
         );
       }),
       // Ensure storage persistence
       ensureStoragePersistence(),
       // Take control of all pages
       self.clients.claim(),
-    ]),
+    ])
   );
 });
 
@@ -91,7 +91,7 @@ self.addEventListener("fetch", (event) => {
         if (event.request.mode === "navigate") {
           return caches.match("/index.html");
         }
-      }),
+      })
   );
 });
 
@@ -151,7 +151,7 @@ async function ensureStoragePersistence() {
       await caches.open(CACHE_NAME).then((cache) => {
         return cache.put(
           new Request(STORAGE_PERSISTENCE_KEY),
-          new Response(JSON.stringify({ persistent, timestamp: Date.now() })),
+          new Response(JSON.stringify({ persistent, timestamp: Date.now() }))
         );
       });
 
@@ -160,7 +160,7 @@ async function ensureStoragePersistence() {
   } catch (error) {
     console.error(
       "Service Worker: Failed to request storage persistence:",
-      error,
+      error
     );
   }
   return false;

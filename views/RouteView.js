@@ -50,7 +50,7 @@ class RouteView {
    */
   getSelectedRouteColor() {
     const selectedBtn = document.querySelector(
-      "#route-colors-add .color-btn.selected",
+      "#route-colors-add .color-btn.selected"
     );
     return selectedBtn ? selectedBtn.dataset.color : null;
   }

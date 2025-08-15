@@ -1,5 +1,6 @@
 import js from "@eslint/js";
 import globals from "globals";
+import prettierConfig from "eslint-config-prettier";
 
 export default [
   {
@@ -16,8 +17,8 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
+      ...prettierConfig.rules,
       quotes: ["error", "double"],
-      indent: ["error", 2],
       "no-unused-vars": [
         "warn",
         {
@@ -60,8 +61,8 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
+      ...prettierConfig.rules,
       quotes: ["error", "double"],
-      indent: ["error", 2],
       "no-unused-vars": ["warn", { args: "none" }],
       "no-undef": ["warn"],
     },
