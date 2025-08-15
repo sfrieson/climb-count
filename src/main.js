@@ -4,6 +4,7 @@ import { ClimbController } from "./controllers/ClimbController.js";
 import { RouteModel } from "./models/RouteModel.js";
 import { RouteView } from "./views/RouteView.js";
 import { RouteController } from "./controllers/RouteController.js";
+import { dialogUtils } from "./utils/DialogUtils.js";
 
 let app;
 
@@ -20,14 +21,32 @@ window.logAttempt = function () {
   }
 };
 
-window.finishSession = function () {
-  if (app && app.controller) {
+window.finishSession = async function () {
+  // Check if app is initialized
+  if (!app || !app.controller) {
+    dialogUtils.showError(
+      "Application is still loading. Please wait a moment and try again.",
+    );
+    return;
+  }
+
+  const confirmed = await dialogUtils.showConfirm(
+    "Are you sure you want to finish this session? This will save your current progress and start a new session.",
+    "Finish Session",
+  );
+
+  if (confirmed) {
     app.controller.finishSession();
   }
 };
 
-window.clearSession = function () {
-  if (app && app.controller) {
+window.clearSession = async function () {
+  const confirmed = await dialogUtils.showConfirm(
+    "Are you sure you want to clear this session? This will permanently delete all unsaved climb data.",
+    "Clear Session",
+  );
+
+  if (confirmed && app && app.controller) {
     app.controller.clearSession();
   }
 };
@@ -47,10 +66,10 @@ window.exportBackup = async function () {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    alert("Backup exported successfully!");
+    dialogUtils.showSuccess("Backup exported successfully!");
   } catch (error) {
     console.error("Export failed:", error);
-    alert("Failed to export backup: " + error.message);
+    dialogUtils.showError("Failed to export backup: " + error.message);
   }
 };
 
@@ -69,11 +88,11 @@ window.handleFileImport = async function (event) {
     // Refresh all views
     await app.controller.refreshViews();
 
-    alert("Backup imported successfully!");
+    dialogUtils.showSuccess("Backup imported successfully!");
     event.target.value = ""; // Clear file input
   } catch (error) {
     console.error("Import failed:", error);
-    alert("Failed to import backup: " + error.message);
+    dialogUtils.showError("Failed to import backup: " + error.message);
     event.target.value = ""; // Clear file input
   }
 };
@@ -183,10 +202,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 // Show update notification to user
-function showUpdateNotification() {
+async function showUpdateNotification() {
   if (
-    confirm(
+    await dialogUtils.showConfirm(
       "A new version of Climb Count is available. Would you like to update now?",
+      "Update Available",
     )
   ) {
     // Tell the service worker to skip waiting and take control

@@ -141,7 +141,9 @@ export class RouteController {
   async deleteRoute(routeId) {
     try {
       if (
-        !this.view.showConfirm("Are you sure you want to delete this route?")
+        !(await this.view.showConfirm(
+          "Are you sure you want to delete this route?",
+        ))
       ) {
         return;
       }
@@ -157,6 +159,69 @@ export class RouteController {
     } catch (error) {
       console.error("Error deleting route:", error);
       this.view.showAlert("Error deleting route: " + error.message);
+    }
+  }
+
+  /**
+   * Edit a route
+   */
+  async editRoute(routeId) {
+    try {
+      // Get the route data
+      const route = await this.getRoute(routeId);
+      if (!route) {
+        this.view.showAlert("Route not found");
+        return;
+      }
+
+      // Add image URL for display
+      route.imageUrl = this.model.createImageURL(route);
+
+      // Show edit dialog
+      const editData = await this.view.showEditDialog(route);
+      if (!editData) {
+        return; // User cancelled
+      }
+
+      // Validate required fields
+      if (!editData.color) {
+        this.view.showAlert("Please select a route color");
+        return;
+      }
+
+      if (!editData.gym) {
+        this.view.showAlert("Please enter a gym/location for the route");
+        return;
+      }
+
+      // Prepare update data
+      const updateData = {
+        name: editData.name,
+        color: editData.color,
+        gym: editData.gym,
+        notes: editData.notes,
+      };
+
+      // Handle image update if provided
+      if (editData.image) {
+        updateData.image = await this.model.fileToArrayBuffer(editData.image);
+      }
+
+      // Update the route
+      await this.model.updateRoute(routeId, updateData);
+
+      this.view.showSuccess("Route updated successfully!");
+
+      // Refresh the routes list
+      await this.loadRoutes();
+
+      // Notify the main controller to refresh route selector
+      if (this.climbController) {
+        await this.climbController.loadRouteSelector();
+      }
+    } catch (error) {
+      console.error("Error editing route:", error);
+      this.view.showAlert("Error updating route: " + error.message);
     }
   }
 

@@ -151,6 +151,42 @@ export class RouteModel {
   }
 
   /**
+   * Update an existing route
+   */
+  async updateRoute(id, routeData) {
+    await this.ensureDBReady();
+
+    const existingRoute = await this.getRouteById(id);
+    if (!existingRoute) {
+      throw new Error("Route not found");
+    }
+
+    const updatedRoute = {
+      ...existingRoute,
+      name: routeData.name !== undefined ? routeData.name : existingRoute.name,
+      color: routeData.color !== undefined ? routeData.color : existingRoute.color,
+      gym: routeData.gym !== undefined ? routeData.gym : existingRoute.gym,
+      notes: routeData.notes !== undefined ? routeData.notes : existingRoute.notes,
+      image: routeData.image !== undefined ? routeData.image : existingRoute.image,
+      updatedAt: new Date(),
+    };
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.#db.transaction([this.#storeName], "readwrite");
+      const store = transaction.objectStore(this.#storeName);
+      const request = store.put(updatedRoute);
+
+      request.onsuccess = () => {
+        resolve(updatedRoute);
+      };
+
+      request.onerror = () => {
+        reject(request.error);
+      };
+    });
+  }
+
+  /**
    * Convert File to ArrayBuffer for storage
    */
   async fileToArrayBuffer(file) {

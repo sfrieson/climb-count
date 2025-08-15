@@ -1,3 +1,5 @@
+import { dialogUtils } from "../utils/DialogUtils.js";
+
 /**
  * View for managing route UI
  */
@@ -131,6 +133,9 @@ class RouteView {
         ${route.notes ? `<p><strong>Notes:</strong> ${route.notes}</p>` : ""}
         <p><small>Added: ${new Date(route.createdAt).toLocaleDateString()}</small></p>
         <div class="route-actions">
+          <button class="edit-route-btn" onclick="app.routeController.editRoute(${route.id})">
+            Edit Route
+          </button>
           <button class="delete-route-btn" onclick="app.routeController.deleteRoute(${route.id})">
             Delete Route
           </button>
@@ -175,21 +180,139 @@ class RouteView {
    * Show alert message
    */
   showAlert(message) {
-    alert(message);
+    dialogUtils.showError(message);
   }
 
   /**
    * Show success message
    */
   showSuccess(message) {
-    alert(message);
+    dialogUtils.showSuccess(message);
   }
 
   /**
    * Show confirmation dialog
    */
-  showConfirm(message) {
-    return confirm(message);
+  async showConfirm(message) {
+    return await dialogUtils.showConfirm(message);
+  }
+
+  /**
+   * Show route edit dialog
+   */
+  async showEditDialog(route) {
+    return new Promise((resolve) => {
+      const overlay = document.createElement("div");
+      overlay.className = "dialog-overlay";
+      
+      const dialog = document.createElement("div");
+      dialog.className = "dialog";
+      
+      const colorOptions = Object.keys(this.colorMap).map(color => {
+        const selected = color === route.color ? 'selected' : '';
+        return `<div class="color-btn ${color} ${selected}" data-color="${color}">${color.charAt(0).toUpperCase() + color.slice(1)}</div>`;
+      }).join('');
+      
+      dialog.innerHTML = `
+        <div class="dialog-header">
+          <h3>Edit Route</h3>
+        </div>
+        <div class="dialog-body">
+          <div class="form-group">
+            <label for="edit-route-image">Route Image</label>
+            <input type="file" id="edit-route-image" accept="image/*" />
+            <div id="edit-image-preview" class="image-preview">
+              <img id="edit-preview-img" src="${route.imageUrl || ''}" style="max-width: 300px; max-height: 200px; border-radius: 8px" />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Route Color</label>
+            <div class="route-colors" id="edit-route-colors">
+              ${colorOptions}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit-route-name">Route Name</label>
+            <input type="text" id="edit-route-name" value="${route.name || ''}" placeholder="e.g., Wall A - Route 3" />
+          </div>
+          
+          <div class="form-group">
+            <label for="edit-route-gym">Gym/Location</label>
+            <input type="text" id="edit-route-gym" value="${route.gym || ''}" placeholder="Enter gym or climbing location" />
+          </div>
+          
+          <div class="form-group">
+            <label for="edit-route-notes">Notes</label>
+            <input type="text" id="edit-route-notes" value="${route.notes || ''}" placeholder="Any additional notes about this route" />
+          </div>
+        </div>
+        <div class="dialog-footer">
+          <button class="dialog-btn dialog-btn-secondary" id="edit-cancel-btn">Cancel</button>
+          <button class="dialog-btn dialog-btn-primary" id="edit-save-btn">Save Changes</button>
+        </div>
+      `;
+      
+      overlay.appendChild(dialog);
+      document.body.appendChild(overlay);
+      
+      // Handle image preview
+      const imageInput = dialog.querySelector("#edit-route-image");
+      const preview = dialog.querySelector("#edit-image-preview");
+      const previewImg = dialog.querySelector("#edit-preview-img");
+      
+      imageInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            previewImg.src = e.target.result;
+            preview.style.display = "block";
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      
+      // Handle color selection
+      const colorButtons = dialog.querySelectorAll("#edit-route-colors .color-btn");
+      let selectedColor = route.color;
+      
+      colorButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          colorButtons.forEach(b => b.classList.remove("selected"));
+          btn.classList.add("selected");
+          selectedColor = btn.dataset.color;
+        });
+      });
+      
+      // Handle buttons
+      dialog.querySelector("#edit-cancel-btn").addEventListener("click", () => {
+        document.body.removeChild(overlay);
+        resolve(null);
+      });
+      
+      dialog.querySelector("#edit-save-btn").addEventListener("click", () => {
+        const formData = {
+          image: imageInput.files[0] || null,
+          name: dialog.querySelector("#edit-route-name").value.trim(),
+          color: selectedColor,
+          gym: dialog.querySelector("#edit-route-gym").value.trim(),
+          notes: dialog.querySelector("#edit-route-notes").value.trim(),
+        };
+        
+        document.body.removeChild(overlay);
+        resolve(formData);
+      });
+      
+      // Close on overlay click
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) {
+          document.body.removeChild(overlay);
+          resolve(null);
+        }
+      });
+    });
   }
 }
 

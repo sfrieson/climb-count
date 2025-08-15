@@ -57,6 +57,11 @@
         overflow: hidden;
       }
 
+      .container:first-child {
+        border-radius: 12px 12px 0 0;
+        margin-bottom: 0;
+      }
+
       .header {
         background: linear-gradient(135deg, #2196f3 0%, #21cbf3 100%);
         color: white;
@@ -72,6 +77,17 @@
       .tabs {
         display: flex;
         background: #f5f5f5;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .content-container {
+        border-radius: 0 0 12px 12px;
+        margin-top: 0;
       }
 
       .tab {
@@ -394,6 +410,11 @@
         color: white;
       }
 
+      .edit-route-btn {
+        background: #2196f3;
+        color: white;
+      }
+
       .route-selector-container {
         margin-top: 10px;
       }
@@ -540,6 +561,420 @@
           font-size: 18px;
         }
       }
+
+      /* Dialog Styles */
+      .dialog-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        animation: fadeIn 0.2s ease-out;
+      }
+
+      .dialog {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 400px;
+        width: 90vw;
+        max-height: 90vh;
+        overflow: hidden;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .dialog-header {
+        padding: 20px 24px 0;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 0;
+      }
+
+      .dialog-header h3 {
+        margin: 0 0 20px;
+        color: #333;
+        font-size: 20px;
+        font-weight: 600;
+      }
+
+      .dialog-body {
+        padding: 20px 24px;
+      }
+
+      .dialog-body p {
+        margin: 0;
+        color: #555;
+        line-height: 1.5;
+        font-size: 16px;
+      }
+
+      .dialog-footer {
+        padding: 0 24px 24px;
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+      }
+
+      .dialog-btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 80px;
+      }
+
+      .dialog-btn-primary {
+        background: #2196f3;
+        color: white;
+      }
+
+      .dialog-btn-primary:hover {
+        background: #1976d2;
+        transform: translateY(-1px);
+      }
+
+      .dialog-btn-secondary {
+        background: #f5f5f5;
+        color: #666;
+      }
+
+      .dialog-btn-secondary:hover {
+        background: #e0e0e0;
+      }
+
+      /* Toast Styles */
+      .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10001;
+        pointer-events: none;
+      }
+
+      .toast {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        margin-bottom: 12px;
+        max-width: 400px;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: auto;
+        border-left: 4px solid;
+      }
+
+      .toast-show {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .toast-hide {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+
+      .toast-content {
+        display: flex;
+        align-items: center;
+        padding: 16px 20px;
+        gap: 12px;
+      }
+
+      .toast-icon {
+        font-size: 18px;
+        font-weight: bold;
+        flex-shrink: 0;
+      }
+
+      .toast-message {
+        flex: 1;
+        font-size: 14px;
+        line-height: 1.4;
+        color: #333;
+      }
+
+      .toast-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #999;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+
+      .toast-close:hover {
+        background: #f0f0f0;
+        color: #666;
+      }
+
+      .toast-success {
+        border-left-color: #4caf50;
+      }
+
+      .toast-success .toast-icon {
+        color: #4caf50;
+      }
+
+      .toast-error {
+        border-left-color: #f44336;
+      }
+
+      .toast-error .toast-icon {
+        color: #f44336;
+      }
+
+      .toast-warning {
+        border-left-color: #ff9800;
+      }
+
+      .toast-warning .toast-icon {
+        color: #ff9800;
+      }
+
+      .toast-info {
+        border-left-color: #2196f3;
+      }
+
+      .toast-info .toast-icon {
+        color: #2196f3;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9) translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .dialog {
+          width: 95vw;
+          margin: 20px;
+        }
+
+        .toast-container {
+          top: 10px;
+          right: 10px;
+          left: 10px;
+        }
+
+        .toast {
+          max-width: none;
+        }
+      }
+
+      /* Edit Attempt Functionality Styles */
+      .attempt-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .edit-attempt-btn, .delete-attempt-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        font-size: 14px;
+        opacity: 0.7;
+        transition: all 0.2s;
+      }
+
+      .edit-attempt-btn:hover {
+        background: #e3f2fd;
+        opacity: 1;
+      }
+
+      .delete-attempt-btn:hover {
+        background: #ffebee;
+        opacity: 1;
+      }
+
+      .timeline-attempt:hover {
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      }
+
+      /* Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 8px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 20px 10px 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        color: #333;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #999;
+      }
+
+      .modal-close:hover {
+        background: #f5f5f5;
+        color: #333;
+      }
+
+      .modal-body {
+        padding: 20px;
+      }
+
+      .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 20px 20px 20px;
+        border-top: 1px solid #eee;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      .form-group select:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #2196f3;
+        box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+      }
+
+      .result-buttons {
+        display: flex;
+        gap: 10px;
+      }
+
+      .result-buttons .success-btn,
+      .result-buttons .failure-btn {
+        flex: 1;
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-1px);
+      }
+
+      .btn-danger {
+        background: #dc3545;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-1px);
+      }
+
+      .btn-primary {
+        background: #2196f3;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .btn-primary:hover {
+        background: #1976d2;
+        transform: translateY(-1px);
+      }
     </style>
   </head>
   <body>
@@ -548,16 +983,18 @@
         <h1>🧗‍♀️ Climb Count</h1>
         <p>Track your climbing progress and improve your skills</p>
       </div>
+    </div>
 
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab('log')">
-          Log Session
-        </button>
-        <button class="tab" onclick="switchTab('routes')">Add Route</button>
-        <button class="tab" onclick="switchTab('sessions')">Sessions</button>
-        <button class="tab" onclick="switchTab('stats')">Statistics</button>
-      </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('log')">
+        Log Session
+      </button>
+      <button class="tab" onclick="switchTab('routes')">Add Route</button>
+      <button class="tab" onclick="switchTab('sessions')">Sessions</button>
+      <button class="tab" onclick="switchTab('stats')">Statistics</button>
+    </div>
 
+    <div class="container content-container">
       <div class="tab-content">
         <div id="log" class="tab-pane active">
           <h2>New Climbing Session</h2>

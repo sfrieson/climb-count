@@ -1,3 +1,5 @@
+import { dialogUtils } from "../utils/DialogUtils.js";
+
 export class ClimbController {
   constructor(model, view) {
     this.model = model;
@@ -30,6 +32,25 @@ export class ClimbController {
           this.handleRouteSelection(routeItem.dataset.routeId);
         }
       }
+
+      // Handle edit attempt button clicks
+      if (e.target.classList.contains("edit-attempt-btn")) {
+        const attemptId = parseInt(e.target.dataset.attemptId);
+        this.handleEditAttempt(attemptId);
+      }
+
+      // Handle delete attempt button clicks
+      if (e.target.classList.contains("delete-attempt-btn")) {
+        const attemptId = parseInt(e.target.dataset.attemptId);
+        this.handleDeleteAttempt(attemptId);
+      }
+
+      // Handle timeline attempt clicks (for completed sessions)
+      if (e.target.classList.contains("timeline-attempt")) {
+        const sessionId = parseInt(e.target.dataset.sessionId);
+        const attemptId = parseInt(e.target.dataset.attemptId);
+        this.handleEditAttemptFromSession(sessionId, attemptId);
+      }
     });
 
     // Gym dropdown event listener
@@ -51,7 +72,7 @@ export class ClimbController {
     }
 
     const finishSessionBtn = document.querySelector(
-      "[onclick=\"finishSession()\"]",
+      '[onclick="finishSession()"]',
     );
     if (finishSessionBtn) {
       finishSessionBtn.onclick = async () => await this.finishSession();
@@ -244,9 +265,10 @@ export class ClimbController {
   async clearSession() {
     // Ask for confirmation before clearing
     if (
-      !confirm(
+      !(await dialogUtils.showConfirm(
         "Are you sure you want to clear the current session? All unsaved attempts will be lost.",
-      )
+        "Clear Session",
+      ))
     ) {
       return;
     }
@@ -258,6 +280,105 @@ export class ClimbController {
       this.clearAttemptForm();
     } catch (error) {
       this.view.showAlert("Error clearing session: " + error.message);
+    }
+  }
+
+  /**
+   * Handle editing an attempt from the current session
+   */
+  async handleEditAttempt(attemptId) {
+    const currentSession = this.model.getCurrentSession();
+    if (!currentSession) {
+      this.view.showAlert("No active session found");
+      return;
+    }
+
+    const attempt = currentSession.attempts.find(a => a.id === attemptId);
+    if (!attempt) {
+      this.view.showAlert("Attempt not found");
+      return;
+    }
+
+    await this.showEditAttemptModal(attempt, currentSession.id);
+  }
+
+  /**
+   * Handle editing an attempt from a completed session
+   */
+  async handleEditAttemptFromSession(sessionId, attemptId) {
+    const session = this.model.getSessions().find(s => s.id === sessionId);
+    if (!session) {
+      this.view.showAlert("Session not found");
+      return;
+    }
+
+    const attempt = session.attempts.find(a => a.id === attemptId);
+    if (!attempt) {
+      this.view.showAlert("Attempt not found");
+      return;
+    }
+
+    await this.showEditAttemptModal(attempt, sessionId);
+  }
+
+  /**
+   * Handle deleting an attempt from the current session
+   */
+  async handleDeleteAttempt(attemptId) {
+    const currentSession = this.model.getCurrentSession();
+    if (!currentSession) {
+      this.view.showAlert("No active session found");
+      return;
+    }
+
+    if (confirm("Are you sure you want to delete this attempt? This action cannot be undone.")) {
+      try {
+        await this.model.deleteAttemptFromCurrentSession(attemptId);
+        this.refreshCurrentSessionView();
+      } catch (error) {
+        this.view.showAlert("Error deleting attempt: " + error.message);
+      }
+    }
+  }
+
+  /**
+   * Show the edit attempt modal
+   */
+  async showEditAttemptModal(attempt, sessionId) {
+    if (!this.routeController) {
+      this.view.showAlert("Route controller not available");
+      return;
+    }
+
+    try {
+      const routes = await this.routeController.model.getAllRoutes();
+      
+      this.view.showEditAttemptModal(
+        attempt,
+        routes,
+        async (updatedData) => {
+          try {
+            await this.model.updateAttempt(sessionId, attempt.id, updatedData);
+            this.refreshCurrentSessionView();
+            this.refreshSessionsView();
+            this.refreshStatsView();
+          } catch (error) {
+            this.view.showAlert("Error updating attempt: " + error.message);
+          }
+        },
+        async () => {
+          try {
+            await this.model.deleteAttempt(sessionId, attempt.id);
+            this.refreshCurrentSessionView();
+            this.refreshSessionsView();
+            this.refreshStatsView();
+          } catch (error) {
+            this.view.showAlert("Error deleting attempt: " + error.message);
+          }
+        }
+      );
+    } catch (error) {
+      this.view.showAlert("Error loading routes: " + error.message);
     }
   }
 }

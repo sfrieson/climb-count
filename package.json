@@ -11,11 +11,16 @@
     "test": "jest --testPathPattern=\"(basic-functionality|route-image)\"",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:e2e": "jest --config=jest.e2e.config.js",
+    "test:e2e:headless": "jest --config=jest.e2e.config.js",
+    "test:e2e:debug": "HEADLESS=false jest --config=jest.e2e.config.js",
+    "test:all": "npm run test && npm run test:e2e",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "validate": "npm run lint && npm run format:check && npm run test",
+    "validate:full": "npm run lint && npm run format:check && npm run test:all",
     "prepare": "husky install"
   },
   "keywords": [
@@ -34,7 +39,9 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^15.0.0",
+    "node-fetch": "^3.3.2",
     "prettier": "^3.0.0",
+    "puppeteer": "^24.16.2",
     "vite": "^7.1.2"
   },
   "lint-staged": {

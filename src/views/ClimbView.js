@@ -1,3 +1,5 @@
+import { dialogUtils } from "../utils/DialogUtils.js";
+
 class ClimbView {
   constructor() {
     this.colorMap = {
@@ -51,13 +53,14 @@ class ClimbView {
                 <div>
                     ${routeInfo}
                     ${
-  attempt.notes
-    ? `<br><small>Notes: ${attempt.notes}</small>`
-    : ""
-}
+                      attempt.notes
+                        ? `<br><small>Notes: ${attempt.notes}</small>`
+                        : ""
+                    }
                 </div>
-                <div>
+                <div class="attempt-actions">
                     ${attempt.success ? "✅ Success" : "❌ Failed"}
+                    <button class="edit-attempt-btn" data-attempt-id="${attempt.id}" title="Edit attempt">✏️</button>
                 </div>
             `;
       container.appendChild(attemptElement);
@@ -176,11 +179,11 @@ class ClimbView {
         const rate = ((stats.success / stats.total) * 100).toFixed(1);
         return `
                     <div class="stat-card" style="border-left: 5px solid ${this.getColorHex(
-    color,
-  )};">
+                      color,
+                    )};">
                         <div style="font-weight: bold; color: ${this.getColorHex(
-    color,
-  )};">${color.toUpperCase()}</div>
+                          color,
+                        )};">${color.toUpperCase()}</div>
                         <div class="stat-number">${rate}%</div>
                         <div>${stats.success}/${stats.total} attempts</div>
                     </div>
@@ -443,8 +446,8 @@ class ClimbView {
         const rate = ((stats.success / stats.total) * 100).toFixed(0);
         return `<span style="color: ${this.getColorHex(color)};">
                     <strong>${color.toUpperCase()}</strong>: ${stats.success}/${
-  stats.total
-} (${rate}%)
+                      stats.total
+                    } (${rate}%)
                 </span>`;
       })
       .join(" | ");
@@ -461,14 +464,16 @@ class ClimbView {
         const routeName = attempt.route
           ? attempt.route.name || "Unnamed"
           : "Unknown Route";
-        return `<span title="${routeName} (${attemptColor}) - ${
+        return `<span class="timeline-attempt" data-session-id="${session.id}" data-attempt-id="${attempt.id}" 
+                      title="${routeName} (${attemptColor}) - ${
           attempt.success ? "Success" : "Failed"
-        }" 
-                          style="display: inline-block; margin: 2px; padding: 4px 6px; 
-                                 background: ${color}; color: ${
-  attemptColor === "white" ? "black" : "white"
-}; 
-                                 border-radius: 4px; font-size: 12px;">
+        } - Click to edit" 
+                      style="display: inline-block; margin: 2px; padding: 4px 6px; 
+                             background: ${color}; color: ${
+                               attemptColor === "white" ? "black" : "white"
+                             }; 
+                             border-radius: 4px; font-size: 12px; cursor: pointer;
+                             position: relative;">
                         ${symbol}
                     </span>`;
       })
@@ -482,7 +487,7 @@ class ClimbView {
   }
 
   showAlert(message) {
-    alert(message);
+    dialogUtils.showError(message);
   }
 
   getFormData() {
@@ -586,6 +591,182 @@ class ClimbView {
         }
       }, 100);
     }
+  }
+
+  /**
+   * Show edit attempt modal
+   */
+  showEditAttemptModal(attempt, routes, onSave, onDelete) {
+    // First, make sure any existing modal is removed
+    this.hideEditAttemptModal();
+
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay";
+    modal.id = "edit-attempt-modal";
+
+    const routeOptions = routes
+      .map(route => {
+        const colorHex = this.getColorHex(route.color);
+        const selected = attempt.routeId === route.id ? "selected" : "";
+        return `<option value="${route.id}" ${selected} data-color="${route.color}" data-name="${route.name || 'Unnamed'}" data-gym="${route.gym || ''}">
+          ${route.name || "Unnamed"} (${route.color.toUpperCase()}) ${route.gym ? `• ${route.gym}` : ""}
+        </option>`;
+      })
+      .join("");
+
+    // Track current selection state
+    let selectedSuccess = attempt.success;
+
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Edit Attempt</h3>
+          <button class="modal-close" type="button">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="edit-route-select">Route:</label>
+            <select id="edit-route-select" required>
+              ${routeOptions}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Result:</label>
+            <div class="result-buttons">
+              <button type="button" class="success-btn ${attempt.success ? 'selected' : ''}" data-result="true">✅ Success</button>
+              <button type="button" class="failure-btn ${!attempt.success ? 'selected' : ''}" data-result="false">❌ Failed</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="edit-notes">Notes (optional):</label>
+            <textarea id="edit-notes" rows="3" placeholder="Any additional notes about this attempt...">${attempt.notes || ""}</textarea>
+          </div>
+          <div class="form-group">
+            <small>Logged: ${attempt.timestamp.toLocaleString()}</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-action="delete">Delete Attempt</button>
+          <button type="button" class="btn btn-secondary" data-action="cancel">Cancel</button>
+          <button type="button" class="btn btn-primary" data-action="save">Save Changes</button>
+        </div>
+      </div>
+    `;
+
+    // Add single click event listener to the modal using event delegation
+    modal.addEventListener("click", async (e) => {
+      const target = e.target;
+      
+      // Handle close button (X)
+      if (target.classList.contains("modal-close")) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.hideEditAttemptModal();
+        return;
+      }
+
+      // Handle result selection buttons
+      if (target.classList.contains("success-btn") || target.classList.contains("failure-btn")) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Remove selected class from both buttons
+        modal.querySelectorAll(".success-btn, .failure-btn").forEach(btn => {
+          btn.classList.remove("selected");
+        });
+        
+        // Add selected class to clicked button
+        target.classList.add("selected");
+        
+        // Update selected success value
+        selectedSuccess = target.dataset.result === "true";
+        console.log("Result selected:", selectedSuccess);
+        return;
+      }
+
+      // Handle action buttons (save, delete, cancel)
+      if (target.dataset.action) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const action = target.dataset.action;
+        console.log("Action clicked:", action);
+
+        if (action === "cancel") {
+          this.hideEditAttemptModal();
+        } else if (action === "delete") {
+          // Use custom dialog instead of browser confirm
+          const confirmed = await dialogUtils.showConfirm(
+            "Are you sure you want to delete this attempt? This action cannot be undone.",
+            "Delete Attempt"
+          );
+          
+          if (confirmed) {
+            onDelete();
+            this.hideEditAttemptModal();
+          }
+        } else if (action === "save") {
+          const routeSelect = document.getElementById("edit-route-select");
+          const selectedOption = routeSelect.options[routeSelect.selectedIndex];
+          const notes = document.getElementById("edit-notes").value.trim();
+
+          if (!routeSelect.value) {
+            this.showAlert("Please select a route");
+            return;
+          }
+
+          const updatedData = {
+            routeId: parseInt(routeSelect.value),
+            route: {
+              id: parseInt(routeSelect.value),
+              color: selectedOption.dataset.color,
+              name: selectedOption.dataset.name,
+              gym: selectedOption.dataset.gym
+            },
+            success: selectedSuccess,
+            notes: notes || null
+          };
+
+          console.log("Saving updated data:", updatedData);
+          onSave(updatedData);
+          this.hideEditAttemptModal();
+        }
+        return;
+      }
+
+      // Handle clicking on overlay background (close modal)
+      if (target === modal) {
+        this.hideEditAttemptModal();
+      }
+    });
+
+    document.body.appendChild(modal);
+
+    // Focus on route select after a brief delay
+    setTimeout(() => {
+      const routeSelect = document.getElementById("edit-route-select");
+      if (routeSelect) {
+        routeSelect.focus();
+      }
+    }, 100);
+  }
+
+  /**
+   * Hide edit attempt modal
+   */
+  hideEditAttemptModal() {
+    const modal = document.getElementById("edit-attempt-modal");
+    if (modal) {
+      // Remove event listeners by removing the element completely
+      modal.remove();
+    }
+    
+    // Also clean up any stray modals with the same class
+    document.querySelectorAll(".modal-overlay").forEach(m => {
+      if (m.id === "edit-attempt-modal") {
+        m.remove();
+      }
+    });
   }
 }
 

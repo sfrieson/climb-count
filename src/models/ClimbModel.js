@@ -259,6 +259,132 @@ export class ClimbModel {
     return attempt;
   }
 
+  /**
+   * Update an existing attempt in a session
+   */
+  async updateAttempt(sessionId, attemptId, updatedData) {
+    // Find the session
+    const session = this.sessions.find(s => s.id === sessionId);
+    if (!session) {
+      // Check if it's in the current session
+      if (this.currentSession && this.currentSession.id === sessionId) {
+        return this.updateAttemptInCurrentSession(attemptId, updatedData);
+      }
+      throw new Error("Session not found");
+    }
+
+    // Find the attempt
+    const attemptIndex = session.attempts.findIndex(a => a.id === attemptId);
+    if (attemptIndex === -1) {
+      throw new Error("Attempt not found");
+    }
+
+    // Validate updated data
+    if (updatedData.route && (updatedData.success === null || updatedData.success === undefined)) {
+      throw new Error("Route and result are required");
+    }
+
+    // Update the attempt
+    const originalAttempt = session.attempts[attemptIndex];
+    const updatedAttempt = {
+      ...originalAttempt,
+      ...updatedData,
+      id: attemptId, // Keep original ID
+      timestamp: originalAttempt.timestamp, // Keep original timestamp
+    };
+
+    session.attempts[attemptIndex] = updatedAttempt;
+    
+    // Save sessions to persistent storage
+    await this.saveSessions();
+    
+    return updatedAttempt;
+  }
+
+  /**
+   * Update an attempt in the current (active) session
+   */
+  async updateAttemptInCurrentSession(attemptId, updatedData) {
+    if (!this.currentSession) {
+      throw new Error("No active session");
+    }
+
+    const attemptIndex = this.currentSession.attempts.findIndex(a => a.id === attemptId);
+    if (attemptIndex === -1) {
+      throw new Error("Attempt not found in current session");
+    }
+
+    // Validate updated data
+    if (updatedData.route && (updatedData.success === null || updatedData.success === undefined)) {
+      throw new Error("Route and result are required");
+    }
+
+    // Update the attempt
+    const originalAttempt = this.currentSession.attempts[attemptIndex];
+    const updatedAttempt = {
+      ...originalAttempt,
+      ...updatedData,
+      id: attemptId, // Keep original ID
+      timestamp: originalAttempt.timestamp, // Keep original timestamp
+    };
+
+    this.currentSession.attempts[attemptIndex] = updatedAttempt;
+    
+    // Save draft since this is current session
+    await this.saveDraft();
+    
+    return updatedAttempt;
+  }
+
+  /**
+   * Delete an attempt from a session
+   */
+  async deleteAttempt(sessionId, attemptId) {
+    // Find the session
+    const session = this.sessions.find(s => s.id === sessionId);
+    if (!session) {
+      // Check if it's in the current session
+      if (this.currentSession && this.currentSession.id === sessionId) {
+        return this.deleteAttemptFromCurrentSession(attemptId);
+      }
+      throw new Error("Session not found");
+    }
+
+    // Find and remove the attempt
+    const attemptIndex = session.attempts.findIndex(a => a.id === attemptId);
+    if (attemptIndex === -1) {
+      throw new Error("Attempt not found");
+    }
+
+    const deletedAttempt = session.attempts.splice(attemptIndex, 1)[0];
+    
+    // Save sessions to persistent storage
+    await this.saveSessions();
+    
+    return deletedAttempt;
+  }
+
+  /**
+   * Delete an attempt from the current (active) session
+   */
+  async deleteAttemptFromCurrentSession(attemptId) {
+    if (!this.currentSession) {
+      throw new Error("No active session");
+    }
+
+    const attemptIndex = this.currentSession.attempts.findIndex(a => a.id === attemptId);
+    if (attemptIndex === -1) {
+      throw new Error("Attempt not found in current session");
+    }
+
+    const deletedAttempt = this.currentSession.attempts.splice(attemptIndex, 1)[0];
+    
+    // Save draft since this is current session
+    await this.saveDraft();
+    
+    return deletedAttempt;
+  }
+
   async finishCurrentSession() {
     if (!this.currentSession || this.currentSession.attempts.length === 0) {
       throw new Error("No session to finish or no attempts logged");
