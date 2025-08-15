@@ -9,7 +9,7 @@ import puppeteer from "puppeteer";
  * Default test configuration
  */
 export const TEST_CONFIG = {
-  headless: true,
+  headless: process.env.HEADLESS !== "false",
   viewport: {
     width: 1280,
     height: 720,
@@ -24,11 +24,20 @@ export const TEST_CONFIG = {
  * @returns {Promise<import('puppeteer').Browser>}
  */
 export async function launchBrowser(options = {}) {
-  return await puppeteer.launch({
+  const launchOptions = {
     headless: TEST_CONFIG.headless,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
     ...options,
-  });
+  };
+
+  // Add debug-friendly options when not in headless mode
+  if (!TEST_CONFIG.headless) {
+    console.log("🔍 Debug mode: Browser window will be visible");
+    launchOptions.slowMo = 50; // Slow down actions by 50ms for visibility
+    launchOptions.devtools = false; // Keep devtools closed initially
+  }
+
+  return await puppeteer.launch(launchOptions);
 }
 
 /**

@@ -3,16 +3,7 @@
  * Tests adding routes, color selection, and image uploads
  */
 
-import {
-  launchBrowser,
-  createPage,
-  navigateToApp,
-  waitForElement,
-  clickElement,
-  getElementText,
-  elementExists,
-  waitForAppReady,
-} from "./setup.js";
+import { launchBrowser, createPage } from "./setup.js";
 
 describe("Climb Count - Route Management", () => {
   let browser;
@@ -30,12 +21,11 @@ describe("Climb Count - Route Management", () => {
 
   beforeEach(async () => {
     page = await createPage(browser);
-    await navigateToApp(page);
-    await waitForAppReady(page);
+    await page.goto("http://localhost:8000", { waitUntil: "networkidle2" });
 
     // Navigate to Add Route tab
-    await clickElement(page, ".tab:nth-child(2)");
-    await waitForElement(page, "#routes");
+    await page.click(".tab:nth-child(2)");
+    await page.waitForSelector("#routes", { timeout: 10000 });
   });
 
   afterEach(async () => {
@@ -45,7 +35,7 @@ describe("Climb Count - Route Management", () => {
   });
 
   test("should display route image upload field", async () => {
-    await waitForElement(page, "#route-image");
+    await page.waitForSelector("#route-image", { timeout: 10000 });
 
     const imageInput = await page.$("#route-image");
     expect(imageInput).not.toBeNull();
@@ -58,7 +48,7 @@ describe("Climb Count - Route Management", () => {
   });
 
   test("should display all route color options", async () => {
-    await waitForElement(page, "#route-colors-add");
+    await page.waitForSelector("#route-colors-add", { timeout: 10000 });
 
     const colorOptions = await page.$$eval(
       "#route-colors-add .color-btn",
@@ -91,7 +81,7 @@ describe("Climb Count - Route Management", () => {
   });
 
   test("should handle color selection", async () => {
-    await waitForElement(page, "#route-colors-add");
+    await page.waitForSelector("#route-colors-add", { timeout: 10000 });
 
     // Click on a color button
     const greenButton = await page.$(
@@ -99,32 +89,29 @@ describe("Climb Count - Route Management", () => {
     );
     expect(greenButton).not.toBeNull();
 
-    await clickElement(
-      page,
+    await page.click(
       "#route-colors-add .color-btn[data-color='green']",
     );
 
     // Verify the page is still responsive after color selection
-    const header = await getElementText(page, "#routes h2");
+    const header = await page.$eval("#routes h2", (el) => el.textContent.trim());
     expect(header).toBe("Add New Route");
   });
 
   test("should handle multiple color selections", async () => {
-    await waitForElement(page, "#route-colors-add");
+    await page.waitForSelector("#route-colors-add", { timeout: 10000 });
 
     // Click multiple color buttons
-    await clickElement(
-      page,
+    await page.click(
       "#route-colors-add .color-btn[data-color='green']",
     );
-    await clickElement(page, "#route-colors-add .color-btn[data-color='red']");
-    await clickElement(
-      page,
+    await page.click("#route-colors-add .color-btn[data-color='red']");
+    await page.click(
       "#route-colors-add .color-btn[data-color='purple']",
     );
 
     // Verify the page remains functional
-    const title = await getElementText(page, ".header h1");
+    const title = await page.$eval(".header h1", (el) => el.textContent.trim());
     expect(title).toBe("🧗‍♀️ Climb Count");
   });
 
@@ -157,16 +144,16 @@ describe("Climb Count - Route Management", () => {
 
   test("should navigate back to other tabs from route management", async () => {
     // We're already on Add Route tab, navigate back to Log Session
-    await clickElement(page, ".tab:nth-child(1)");
+    await page.click(".tab:nth-child(1)");
 
     // Wait for Log Session tab to become active
     await page.waitForFunction(() => {
       const activeTab = document.querySelector(".tab.active");
       return activeTab && activeTab.textContent.trim() === "Log Session";
-    });
+    }, { timeout: 10000 });
 
     // Verify we're back on Log Session
-    const header = await getElementText(page, "#log h2");
+    const header = await page.$eval("#log h2", (el) => el.textContent.trim());
     expect(header).toBe("New Climbing Session");
   });
 });
