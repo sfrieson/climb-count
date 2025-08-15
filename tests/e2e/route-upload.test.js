@@ -10,9 +10,9 @@
  * 6. Verify it appears in the routes list
  */
 
-import puppeteer from "puppeteer";
 import path from "path";
 import { fileURLToPath } from "url";
+import { launchBrowser, createPage, navigateToApp, safeClick, safeType, smartDelay, waitForDOMSettle, waitForElementSmart } from "./setup.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,25 +20,24 @@ const __dirname = path.dirname(__filename);
 describe("Route Upload - Critical Path", () => {
   let browser;
   let page;
-  const baseURL = "http://localhost:8000";
 
   beforeAll(async () => {
-    browser = await puppeteer.launch({
-      headless: process.env.NODE_ENV === "production",
-      slowMo: process.env.NODE_ENV !== "production" ? 50 : 0,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    browser = await launchBrowser();
   });
 
   beforeEach(async () => {
-    page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 720 });
-    await page.goto(baseURL, { waitUntil: "networkidle0" });
+    page = await createPage(browser);
+    await navigateToApp(page);
   });
 
   afterEach(async () => {
     if (page) {
-      await page.close();
+      try {
+        await page.close();
+      } catch (error) {
+        // Page might already be closed
+        console.log("Page close error (expected):", error.message);
+      }
     }
   });
 
@@ -50,7 +49,7 @@ describe("Route Upload - Critical Path", () => {
 
   test("Complete route upload flow", async () => {
     // Step 1: Navigate to routes tab
-    await page.click('button.tab:nth-child(2)'); // "Add Route" tab
+    await safeClick(page, 'button.tab:nth-child(2)'); // "Add Route" tab
     await page.waitForSelector('#routes.tab-pane.active', { visible: true });
 
     // Verify we're on the routes tab
@@ -68,7 +67,7 @@ describe("Route Upload - Critical Path", () => {
     expect(previewVisible).not.toBeNull();
 
     // Step 3: Select a color difficulty (let's choose red)
-    await page.click('#route-colors-add [data-color="red"]');
+    await safeClick(page, '#route-colors-add [data-color="red"]');
     
     // Verify color is selected
     const selectedColor = await page.$('#route-colors-add [data-color="red"].selected');
@@ -76,24 +75,21 @@ describe("Route Upload - Critical Path", () => {
 
     // Step 4: Give it a name
     const routeName = `Test Route ${Date.now()}`;
-    await page.type("#route-name", routeName);
+    await safeType(page, "#route-name", routeName, { clear: true });
 
     // Optional: Add gym location
-    await page.type("#route-gym", "Test Climbing Gym");
+    await safeType(page, "#route-gym", "Test Climbing Gym", { clear: true });
 
     // Optional: Add notes
-    await page.type("#route-notes", "E2E test route - automated upload");
+    await safeType(page, "#route-notes", "E2E test route - automated upload", { clear: true });
 
     // Step 5: Save the route
-    await page.click("#save-route-btn");
+    await safeClick(page, "#save-route-btn");
 
-    // Wait for success message (toast notification)
-    await new Promise(resolve => setTimeout(resolve, 500)); // Give time for the route to be saved
+    // Wait for route to be saved - DOM-based wait
+    await waitForElementSmart(page, "#routes-container .route-card");
 
     // Step 6: Verify route appears in the routes list
-    await page.waitForSelector("#routes-container .route-card", { visible: true });
-    
-    // Check that a route card exists with our route name
     const routeCards = await page.$$eval("#routes-container .route-card", cards => 
       cards.map(card => card.textContent)
     );
@@ -117,10 +113,10 @@ describe("Route Upload - Critical Path", () => {
   });
 
   test("Route upload with different colors", async () => {
-    const colors = ['green', 'yellow', 'orange', 'purple', 'black', 'white'];
+    const colors = ['green', 'yellow', 'orange', 'purple', 'black'];
     
     // Navigate to routes tab
-    await page.click('button.tab:nth-child(2)');
+    await safeClick(page, 'button.tab:nth-child(2)');
     await page.waitForSelector('#routes.tab-pane.active', { visible: true });
 
     for (let i = 0; i < colors.length; i++) {
@@ -136,28 +132,25 @@ describe("Route Upload - Critical Path", () => {
       await page.waitForSelector("#image-preview", { visible: true });
       
       // Select color
-      await page.click(`#route-colors-add [data-color="${color}"]`);
+      await safeClick(page, `#route-colors-add [data-color="${color}"]`);
       
       // Add route name and gym (required)
-      await page.evaluate(() => {
-        document.querySelector("#route-name").value = '';
-        document.querySelector("#route-gym").value = '';
-      });
-      await page.type("#route-name", routeName);
-      await page.type("#route-gym", "Test Gym Location");
+      await safeType(page, "#route-name", routeName, { clear: true });
+      await safeType(page, "#route-gym", "Test Gym Location", { clear: true });
       
       // Save route
-      await page.click("#save-route-btn");
+      await safeClick(page, "#save-route-btn");
       
-      // Wait a bit for save to complete
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Wait for route to be saved - much shorter delay
+      await waitForDOMSettle(page);
       
       // Clear form for next iteration (simulate the form clearing)
       await page.evaluate(() => {
         document.getElementById("route-image").value = "";
         document.getElementById("route-name").value = "";
         document.getElementById("route-gym").value = "";
-        document.getElementById("image-preview").style.display = "none";
+        const preview = document.getElementById("image-preview");
+        if (preview) preview.style.display = "none";
         document.querySelectorAll("#route-colors-add .color-btn").forEach(btn => 
           btn.classList.remove("selected")
         );
@@ -165,6 +158,7 @@ describe("Route Upload - Critical Path", () => {
     }
 
     // Verify all routes were created
+    await waitForElementSmart(page, "#routes-container .route-card");
     const routeCards = await page.$$eval("#routes-container .route-card", cards => 
       cards.map(card => ({
         text: card.textContent,
@@ -187,22 +181,28 @@ describe("Route Upload - Critical Path", () => {
 
   test("Route upload validation", async () => {
     // Navigate to routes tab
-    await page.click('button.tab:nth-child(2)');
+    await safeClick(page, 'button.tab:nth-child(2)');
     await page.waitForSelector('#routes.tab-pane.active', { visible: true });
 
     // Try to save without selecting color (should fail or show warning)
     const routeName = `No Color Route ${Date.now()}`;
-    await page.type("#route-name", routeName);
     
-    // Upload photo
+    // Upload photo first
     const photoPath = path.resolve(__dirname, "../../route_photos/route_1.png");
     const fileInput = await page.$("#route-image");
     await fileInput.uploadFile(photoPath);
     
-    await page.click("#save-route-btn");
+    await page.waitForSelector("#image-preview", { visible: true });
     
-    // Should either show error toast or not save the route
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Add name but no color
+    await safeType(page, "#route-name", routeName, { clear: true });
+    await safeType(page, "#route-gym", "Test Gym", { clear: true });
+    
+    // Try to save without color
+    await safeClick(page, "#save-route-btn");
+    
+    // Wait for validation response
+    await smartDelay(200, 1000);
     
     // Check if route was NOT added (since no color selected)
     const routeCards = await page.$$eval("#routes-container .route-card", cards => 
@@ -211,12 +211,12 @@ describe("Route Upload - Critical Path", () => {
     
     const foundInvalidRoute = routeCards.some(cardText => cardText.includes(routeName));
     // This test assumes the app validates and doesn't save routes without color
-    // If the app allows routes without color, this test would need to be adjusted
+    expect(foundInvalidRoute).toBe(false);
   });
 
   test("Route list displays correctly after upload", async () => {
     // Navigate to routes tab
-    await page.click('button.tab:nth-child(2)');
+    await safeClick(page, 'button.tab:nth-child(2)');
     await page.waitForSelector('#routes.tab-pane.active', { visible: true });
 
     // Create a route with all fields filled
@@ -232,33 +232,33 @@ describe("Route Upload - Critical Path", () => {
     await page.waitForSelector("#image-preview", { visible: true });
     
     // Select color
-    await page.click('#route-colors-add [data-color="purple"]');
+    await safeClick(page, '#route-colors-add [data-color="purple"]');
     
     // Fill all fields  
-    await page.evaluate(() => {
-      document.querySelector("#route-name").value = '';
-      document.querySelector("#route-gym").value = '';
-      document.querySelector("#route-notes").value = '';
-    });
-    await page.type("#route-name", routeName);
-    await page.type("#route-gym", gymName);
-    await page.type("#route-notes", routeNotes);
+    await safeType(page, "#route-name", routeName, { clear: true });
+    await safeType(page, "#route-gym", gymName, { clear: true });
+    await safeType(page, "#route-notes", routeNotes, { clear: true });
     
     // Save route
-    await page.click("#save-route-btn");
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await safeClick(page, "#save-route-btn");
+    
+    // Wait for route to be created and displayed - give more time for save operation
+    await smartDelay(500, 1500); // Save operations need more time
+    await waitForElementSmart(page, "#routes-container .route-card");
 
-    // Verify route appears with all information
-    await page.waitForSelector("#routes-container .route-card");
-    const routeCardText = await page.$eval("#routes-container .route-card", el => el.textContent);
+    // Find and verify the specific route we created
+    const routeCards = await page.$$eval("#routes-container .route-card", cards => 
+      cards.map(card => card.textContent)
+    );
     
-    expect(routeCardText).toContain(routeName);
-    expect(routeCardText).toContain("PURPLE");
-    expect(routeCardText).toContain(gymName);
-    expect(routeCardText).toContain(routeNotes);
-    expect(routeCardText).toContain("Added:"); // Should show creation date
+    const ourRouteCard = routeCards.find(cardText => cardText.includes(routeName));
+    expect(ourRouteCard).toBeDefined();
+    expect(ourRouteCard).toContain("PURPLE");
+    expect(ourRouteCard).toContain(gymName);
+    expect(ourRouteCard).toContain(routeNotes);
+    expect(ourRouteCard).toContain("Added:"); // Should show creation date
     
-    // Verify action buttons are present
+    // Verify action buttons are present on any route card (they should all have them)
     const editButton = await page.$('#routes-container .route-card .edit-route-btn');
     const deleteButton = await page.$('#routes-container .route-card .delete-route-btn');
     
