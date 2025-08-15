@@ -91,7 +91,7 @@ class DialogUtils {
 
       // Focus the confirm button
       setTimeout(() => {
-        const confirmBtn = dialog.querySelector('[data-action="confirm"]');
+        const confirmBtn = dialog.querySelector("[data-action=\"confirm\"]");
         confirmBtn.focus();
       }, 100);
     });
@@ -161,15 +161,15 @@ class DialogUtils {
    */
   getToastIcon(type) {
     switch (type) {
-      case "success":
-        return "✓";
-      case "error":
-        return "✕";
-      case "warning":
-        return "⚠";
-      case "info":
-      default:
-        return "ℹ";
+    case "success":
+      return "✓";
+    case "error":
+      return "✕";
+    case "warning":
+      return "⚠";
+    case "info":
+    default:
+      return "ℹ";
     }
   }
 

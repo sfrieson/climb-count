@@ -72,7 +72,7 @@ export class ClimbController {
     }
 
     const finishSessionBtn = document.querySelector(
-      '[onclick="finishSession()"]',
+      "[onclick=\"finishSession()\"]",
     );
     if (finishSessionBtn) {
       finishSessionBtn.onclick = async () => await this.finishSession();
