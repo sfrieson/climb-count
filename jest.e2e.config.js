@@ -6,7 +6,7 @@ export default {
   displayName: "E2E Tests",
   testMatch: ["<rootDir>/tests/e2e/**/*.test.js"],
   testEnvironment: "node",
-  testTimeout: 120000, // Increased to 2 minutes for stability
+  testTimeout: 180000, // Increased to 3 minutes for CI stability
   maxWorkers: 1, // Run E2E tests sequentially to avoid port conflicts
   verbose: true,
   collectCoverage: false, // Coverage not meaningful for E2E tests

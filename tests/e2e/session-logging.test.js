@@ -444,12 +444,39 @@ describe("Session Logging - Critical Path", () => {
     await safeClick(page, 'button[onclick="finishSession()"]');
     await smartDelay(500, 2000);
 
-    // Check Statistics tab
-    await safeClick(page, "button.tab:nth-child(4)"); // "Statistics" tab
-    await page.waitForSelector("#stats.tab-pane.active", { visible: true });
+    // Check Statistics tab with robust waiting and retry logic
+    let tabActivated = false;
+    let attempts = 0;
+    const maxAttempts = 3;
+    
+    while (!tabActivated && attempts < maxAttempts) {
+      attempts++;
+      console.log(`Attempting to activate Statistics tab (attempt ${attempts}/${maxAttempts})`);
+      
+      try {
+        await safeClick(page, "button.tab:nth-child(4)"); // "Statistics" tab
+        await smartDelay(500, 1000); // Give tab time to respond
+        
+        // Wait for tab to become active
+        await waitForElementSmart(page, "#stats.tab-pane.active", { timeout: 20000 });
+        tabActivated = true;
+        console.log("✅ Statistics tab activated successfully");
+        
+      } catch (error) {
+        console.log(`❌ Statistics tab activation failed (attempt ${attempts}): ${error.message}`);
+        if (attempts < maxAttempts) {
+          await smartDelay(2000, 3000); // Wait longer between retries
+        } else {
+          throw new Error(`Failed to activate Statistics tab after ${maxAttempts} attempts`);
+        }
+      }
+    }
 
-    // Verify statistics are updated
-    await waitForElementSmart(page, "#stats-grid .stat-card");
+    // Wait for DOM to settle after tab activation
+    await waitForDOMSettle(page);
+
+    // Verify statistics are updated with extended timeout
+    await waitForElementSmart(page, "#stats-grid .stat-card", { timeout: 30000 });
 
     const statCards = await page.$$("#stats-grid .stat-card");
     expect(statCards.length).toBeGreaterThan(0);

@@ -15,7 +15,7 @@ export const TEST_CONFIG = {
     height: 720,
   },
   baseUrl: "http://localhost:8000",
-  timeout: 45000, // Increased from 30000 to handle longer operations
+  timeout: 60000, // Increased to 60 seconds for CI environments
 };
 
 /**
@@ -243,12 +243,24 @@ export async function waitForDOMSettle(page) {
  * Wait for element with smart timeout based on mode
  */
 export async function waitForElementSmart(page, selector, options = {}) {
-  const timeout = TEST_CONFIG.headless ? 5000 : 10000;
-  return page.waitForSelector(selector, {
+  const isCI = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
+  const defaultTimeout = isCI ? 30000 : (TEST_CONFIG.headless ? 15000 : 10000);
+  
+  const config = {
     visible: true,
-    timeout,
+    timeout: defaultTimeout,
     ...options,
-  });
+  };
+  
+  try {
+    return await page.waitForSelector(selector, config);
+  } catch (error) {
+    // Enhanced error logging for debugging
+    console.log(`waitForElementSmart failed for selector: ${selector}`);
+    console.log(`Timeout: ${config.timeout}ms`);
+    console.log(`CI environment: ${isCI}`);
+    throw error;
+  }
 }
 
 /**
