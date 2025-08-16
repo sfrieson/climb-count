@@ -21,6 +21,7 @@ import {
   smartDelay,
   waitForDOMSettle,
   waitForElementSmart,
+  safeFileUpload,
 } from "./setup.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -66,9 +67,8 @@ describe("Route Upload - Critical Path", () => {
     expect(routesTabContent).not.toBeNull();
 
     // Step 2: Upload a photo from route_photos directory
-    const photoPath = path.resolve(__dirname, "../../route_photos/route_1.png");
-    const fileInput = await page.$("#route-image");
-    await fileInput.uploadFile(photoPath);
+    const photoPath = path.resolve(__dirname, "../../route_photos/test/route_1.png");
+    await safeFileUpload(page, "#route-image", photoPath);
 
     // Wait for image preview to appear
     await page.waitForSelector("#image-preview", { visible: true });
@@ -147,10 +147,9 @@ describe("Route Upload - Critical Path", () => {
       // Upload photo
       const photoPath = path.resolve(
         __dirname,
-        `../../route_photos/route_${(i % 5) + 1}.png`
+        `../../route_photos/test/route_${(i % 5) + 1}.png`
       );
-      const fileInput = await page.$("#route-image");
-      await fileInput.uploadFile(photoPath);
+      await safeFileUpload(page, "#route-image", photoPath);
 
       // Wait for preview
       await page.waitForSelector("#image-preview", { visible: true });
@@ -218,9 +217,8 @@ describe("Route Upload - Critical Path", () => {
     const routeName = `No Color Route ${Date.now()}`;
 
     // Upload photo first
-    const photoPath = path.resolve(__dirname, "../../route_photos/route_1.png");
-    const fileInput = await page.$("#route-image");
-    await fileInput.uploadFile(photoPath);
+    const photoPath = path.resolve(__dirname, "../../route_photos/test/route_1.png");
+    await safeFileUpload(page, "#route-image", photoPath);
 
     await page.waitForSelector("#image-preview", { visible: true });
 
@@ -258,9 +256,8 @@ describe("Route Upload - Critical Path", () => {
     const routeNotes = "Complete test with all fields";
 
     // Upload photo
-    const photoPath = path.resolve(__dirname, "../../route_photos/route_2.png");
-    const fileInput = await page.$("#route-image");
-    await fileInput.uploadFile(photoPath);
+    const photoPath = path.resolve(__dirname, "../../route_photos/test/route_2.png");
+    await safeFileUpload(page, "#route-image", photoPath);
 
     await page.waitForSelector("#image-preview", { visible: true });
 

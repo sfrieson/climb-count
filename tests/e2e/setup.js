@@ -24,6 +24,8 @@ export const TEST_CONFIG = {
  * @returns {Promise<import('puppeteer').Browser>}
  */
 export async function launchBrowser(options = {}) {
+  const isCI = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
+  
   const launchOptions = {
     headless: TEST_CONFIG.headless,
     args: [
@@ -34,6 +36,17 @@ export async function launchBrowser(options = {}) {
       "--disable-extensions",
       "--no-first-run",
       "--disable-default-apps",
+      // Memory management for CI environments
+      "--memory-pressure-off",
+      "--max_old_space_size=4096",
+      // Additional stability flags for CI
+      ...(isCI ? [
+        "--disable-background-timer-throttling",
+        "--disable-backgrounding-occluded-windows", 
+        "--disable-renderer-backgrounding",
+        "--max-memory-usage=1024",
+        "--js-flags=--max-old-space-size=512",
+      ] : []),
     ],
     ...options,
   };
@@ -417,4 +430,58 @@ export async function waitForAppReady(page) {
     },
     { timeout: TEST_CONFIG.timeout }
   );
+}
+
+/**
+ * Safe file upload with error handling and memory management
+ * @param {import('puppeteer').Page} page
+ * @param {string} selector - Input file selector
+ * @param {string} filePath - Path to file to upload
+ * @param {Object} options - Upload options
+ */
+export async function safeFileUpload(page, selector, filePath, options = {}) {
+  const { timeout = 10000, retries = 2 } = options;
+  
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      console.log(`🔄 File upload attempt ${attempt}/${retries}: ${filePath}`);
+      
+      // Check if file exists and get size
+      const fs = await import('fs');
+      const stats = fs.statSync(filePath);
+      console.log(`📁 File size: ${(stats.size / 1024).toFixed(2)} KB`);
+      
+      // Find the file input
+      await page.waitForSelector(selector, { visible: true, timeout });
+      const fileInput = await page.$(selector);
+      
+      if (!fileInput) {
+        throw new Error(`File input not found: ${selector}`);
+      }
+      
+      // Upload the file
+      await fileInput.uploadFile(filePath);
+      
+      // Wait a moment for the upload to process
+      await smartDelay(500, 1000);
+      
+      console.log(`✅ File upload successful: ${filePath}`);
+      return true;
+      
+    } catch (error) {
+      console.error(`❌ File upload attempt ${attempt} failed:`, error.message);
+      
+      if (attempt === retries) {
+        throw new Error(`File upload failed after ${retries} attempts: ${error.message}`);
+      }
+      
+      // Wait before retry
+      await smartDelay(1000, 2000);
+      
+      // Try to clear any memory issues
+      if (global.gc) {
+        global.gc();
+      }
+    }
+  }
 }

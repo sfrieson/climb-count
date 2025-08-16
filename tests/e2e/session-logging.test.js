@@ -20,6 +20,7 @@ import {
   smartDelay,
   waitForDOMSettle,
   waitForElementSmart,
+  safeFileUpload,
 } from "./setup.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -42,9 +43,8 @@ describe("Session Logging - Critical Path", () => {
     await page.waitForSelector("#routes.tab-pane.active", { visible: true });
 
     // Add a test route for logging if none exists
-    const photoPath = path.resolve(__dirname, "../../route_photos/route_1.png");
-    const fileInput = await page.$("#route-image");
-    await fileInput.uploadFile(photoPath);
+    const photoPath = path.resolve(__dirname, "../../route_photos/test/route_1.png");
+    await safeFileUpload(page, "#route-image", photoPath);
 
     await page.waitForSelector("#image-preview", { visible: true });
     await safeClick(page, '#route-colors-add [data-color="red"]');
@@ -71,10 +71,9 @@ describe("Session Logging - Critical Path", () => {
 
     const photoPath2 = path.resolve(
       __dirname,
-      "../../route_photos/route_2.png"
+      "../../route_photos/test/route_2.png"
     );
-    const fileInput2 = await page.$("#route-image");
-    await fileInput2.uploadFile(photoPath2);
+    await safeFileUpload(page, "#route-image", photoPath2);
 
     await page.waitForSelector("#image-preview", { visible: true });
     await safeClick(page, '#route-colors-add [data-color="green"]');

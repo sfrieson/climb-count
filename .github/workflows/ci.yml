@@ -9,6 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -40,6 +41,8 @@ jobs:
           sudo apt-get install -y chromium-browser
           export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
           export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+          # Set Node.js memory limits for CI environment
+          export NODE_OPTIONS="--max-old-space-size=2048 --max-semi-space-size=128"
           npm run test:e2e
 
       - name: Build application

@@ -11,7 +11,7 @@
     "test": "jest --testPathPattern=\"(basic-functionality|route-image)\"",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:e2e": "node --experimental-vm-modules node_modules/.bin/jest --config=jest.e2e.config.js",
+    "test:e2e": "node --experimental-vm-modules node_modules/.bin/jest --config=jest.e2e.config.js --forceExit",
     "test:e2e:debug": "HEADLESS=false node --experimental-vm-modules node_modules/.bin/jest --config=jest.e2e.config.js --verbose --runInBand",
     "test:all": "npm run test && npm run test:e2e",
     "test:pre-push": "npm run test && npm run test:e2e",
